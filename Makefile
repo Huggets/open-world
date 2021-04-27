@@ -22,6 +22,6 @@ mrproper: clean
 
 # Create build/ directory and its equivalent src/ subdirectories
 gen-build-dir:
-	mkdir $(shell for i in $(shell find src); do if [ -d $$i ]; then echo $${i/$(SRCDIR)/$(BUILDDIR)}; fi; done)
+	mkdir -p $(shell for i in $(shell find src); do if [ -d $$i ]; then echo $${i/$(SRCDIR)/$(BUILDDIR)}; fi; done)
 
 .PHONY: clean gen-build-dir
