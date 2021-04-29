@@ -1,0 +1,4 @@
+- Search for sorting source files in a better way than in a single directory
+
+- Code the help menu that is displayed when adding --help or -h to the command
+line (main.cpp)
