@@ -3,20 +3,8 @@
 
 #include <string>
 
-/*
-   TODO Documentation
-   */
-class WorldFileParser {
-    public:
-        /*
-   Convert a world config file into code.
-   
-   // TODO Write a better documentation
-   */
-        static void parse(std::string fileName);
-
-    protected:
-
-};
+namespace  worldFileParser {
+    void parse(std::string fileName);
+}
 
 #endif
