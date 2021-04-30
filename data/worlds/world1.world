@@ -1,1 +1,5 @@
-Hello world!
+#deftile
+0: air.png
+1: grass.png
+2: dirt.png
+#enddef
