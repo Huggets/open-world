@@ -9,11 +9,16 @@ OBJ=$(patsubst $(SRCDIR)/%,$(BUILDDIR)/%,$(SRC:.cpp=.o))
 
 all: gen-build-dir $(EXEC)
 
+debug: CXXDEBUG=-g
+
+debug: all
+
+
 open-world: $(OBJ)
-	$(CXX) $^ -o $@ $(LDFLAGS) $(CXXFLAGS)
+	$(CXX) $^ -o $@ $(LDFLAGS) $(CXXFLAGS) $(CXXDEBUG)
 
 $(BUILDDIR)/%.o: $(SRCDIR)/%.cpp
-	$(CXX) -c $< -o $@ $(CXXFLAGS)
+	$(CXX) -c $< -o $@ $(CXXFLAGS) $(CXXDEBUG)
 
 clean:
 	rm -rf build
