@@ -1,14 +1,14 @@
-#include <iostream>
 #include "console.hpp"
+#include <iostream>
 
-void console::error(std::string message) {
+void console::error(const char message[]) {
     std::cout << "Error: " << message << std::endl;
 }
 
-void console::warning(std::string message) {
+void console::warning(const char message[]) {
     std::cout << "Warning: " << message << std::endl;
 }
 
-void console::info(std::string message) {
+void console::info(const char message[]) {
     std::cout << "Info: " << message << std::endl;
 }
