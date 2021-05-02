@@ -11,29 +11,29 @@ class Character {
         Character();
 
         /*
-           Draw the character inside window.
+           Draws the character inside window.
            */
-        void draw(sf::RenderWindow &window) const;
+        void draw(sf::RenderWindow& window) const;
 
         /*
-           Set the texture of the character.
+           Sets the texture of the character.
            */
-        void setTexture(sf::Texture &texture);
+        void setTexture(sf::Texture& texture);
 
         /*
-           Move the character according to the offsets.
+           Moves the character according to the offsets.
            */
-        void move(int offsetX, int offsetY);
+        void move(float offsetX, float offsetY);
 
         /*
-           Return the x absolute coordinate of the character.
+           Returns the x absolute coordinate of the character.
            */
-        int getX() const;
+        float getX() const;
 
         /*
-           Return the y absolute coordinate of the character.
+           Returns the y absolute coordinate of the character.
            */
-        int getY() const;
+        float getY() const;
 
     protected:
         /*
@@ -44,12 +44,12 @@ class Character {
         /*
            Absolute x coordinate.
            */
-        int _x;
+        float _x;
 
         /*
            Absolute y coordinate.
            */
-        int _y;
+        float _y;
 };
 
 #endif
