@@ -4,23 +4,23 @@
 #include <string>
 
 /*
-   Contain functions that print message on the console.
+   Contains functions that print message on the console.
    */
 namespace console {
     /*
-       Print an error message in the console.
+       Prints an error message in the console.
        */
-    void error(std::string message);
+    void error(const char message[]);
 
     /*
-       Print a warning message in the console.
+       Prints a warning message in the console.
        */
-    void warning(std::string message);
+    void warning(const char message[]);
 
     /*
-       Print an info message in the console.
+       Prints an info message in the console.
        */
-    void info(std::string message);
+    void info(const char message[]);
 }
 
 #endif
