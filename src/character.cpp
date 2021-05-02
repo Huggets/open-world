@@ -6,24 +6,24 @@ Character::Character() :
 {
 }
 
-void Character::draw(sf::RenderWindow &window) const {
+void Character::draw(sf::RenderWindow& window) const {
     window.draw(_sprite);
 }
 
-void Character::setTexture(sf::Texture &texture) {
+void Character::setTexture(sf::Texture& texture) {
     _sprite.setTexture(texture);
 }
 
-void Character::move(int offsetX, int offsetY) {
+void Character::move(float offsetX, float offsetY) {
     _x = _x + offsetX;
     _y = _y + offsetY;
     _sprite.move(offsetX, offsetY);
 }
 
-int Character::getX() const {
+float Character::getX() const {
     return _x;
 }
 
-int Character::getY() const {
+float Character::getY() const {
     return _y;
 }
