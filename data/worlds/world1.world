@@ -1,5 +1,19 @@
 #deftile
-0: air.png
-1: grass.png
-2: dirt.png
-#enddef
+0 air
+1 grass
+2 dirt
+#fedtile
+
+#defworld
+10 10
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 2 2 2 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+0 0 0 0 0 0 0 0 0 0
+1 1 1 0 0 0 0 0 0 1
+2 2 2 1 1 0 0 1 1 2
+2 2 2 2 2 1 1 2 2 2
+#fedworld
