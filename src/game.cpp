@@ -6,13 +6,9 @@
 #include <iostream>
 #include <queue>
 #include <thread>
+#include <vector>
 #include "console.hpp"
 #include "worldfileparser.hpp"
-
-#define NEW_TEXTURE std::unique_ptr<sf::Texture>(new sf::Texture)
-#define PNG_PERSON "data/images/person.png"
-#define FONT_LINBIOLUM "data/fonts/linbiolum.otf"
-#define WORLD_CONFIG "data/worlds/world1.world"
 
 Game::Game() :
     _window(sf::VideoMode(800, 600), "Open World", sf::Style::Close),
@@ -22,53 +18,95 @@ Game::Game() :
     _fpsText(),
     _startTime(clock()),
     _lastTime(_startTime),
+    _diffTime(0),
     _fpsTime(0),
     _fpsTimeTmp(0),
     _sleepTime(0),
-    _playerCharacter(&_person1),
     _person1(),
-    _person2()
+    _person2(),
+    _playerCharacter(&_person1)
 {
-    // Loading files
-    _textures["person"] = NEW_TEXTURE;
-    _textures["person"]->loadFromFile(PNG_PERSON);
-    _textures["dirt"] = NEW_TEXTURE;
+    /*
+       Loading files
+     */
+    _textures["person"] = std::make_unique<sf::Texture>();
+    _textures["person"]->loadFromFile("data/images/person-top.png");
+    _textures["dirt"] = std::make_unique<sf::Texture>();
     _textures["dirt"]->loadFromFile("data/images/dirt.png");
-    _font.loadFromFile(FONT_LINBIOLUM);
+    _textures["grass"] = std::make_unique<sf::Texture>();
+    _textures["grass"]->loadFromFile("data/images/grass.png");
 
+    // FONTS
+    _font.loadFromFile("data/fonts/linbiolum.otf");
+
+    // WORLDS
+    // Getting information from a world file
+    const std::string worldFilename("data/worlds/world1.world");
+    float width(0);
+    float height(0);
+    std::unique_ptr<std::unordered_map<int, std::string>> tileMap;
+    std::vector<int> intTiles;
+    wfp::parse(worldFilename, width, height, intTiles, tileMap);
+
+    // Creating the appropriate World object
+    auto tiles = std::make_unique<Tile[]>(width*height);
+    for (float y = 0, n = 0 ; y < height ; y++ )
+    {
+        for (float x = 0 ; x < width ; x++, n++ )
+        {
+            Tile& tile = tiles[n];
+            tile.setPosition(x*tile.getWidth(), y*tile.getHeight());
+            tile.setTexture(_textures[tileMap->at(intTiles[n])].get());
+        }
+    }
+    _world = std::make_unique<World>(width, height, tiles);
+
+    /*
+       Default settings
+     */
     _person1.setTexture(*_textures["person"]);
-    _person2.setTexture(*_textures["dirt"]);
+    _person2.setTexture(*_textures["person"]);
     _playerCoordinatesText.setFont(_font);
     _playerCoordinatesText.setPosition(0, 570);
     _playerCoordinatesText.setFillColor(sf::Color::Black);
     _fpsText.setFont(_font);
     _fpsText.setPosition(0, 0);
     _fpsText.setFillColor(sf::Color::Black);
-    _fpsText.setString("nothing");
+    _fpsText.setString("No fps");
 }
 
-void Game::run(bool profile, char profileConfigName[]) {
+void Game::run(bool profile, const std::string& performanceFile)
+{
     // Each time we save the fps we add it in fpsTotal
     unsigned long int fpsTotal(0);
     // Number of fps saved
     unsigned int fpsTotalCount(0);
     // We will store the information about the performance in a file
-    std::fstream profileFile(profileConfigName, std::fstream::in | std::fstream::app);
+    std::fstream profileFile(
+            performanceFile,
+            std::fstream::in | std::fstream::app);
     // Contains all the fps saved
     std::queue<int> fps;
 
-    if (profile and profileFile.is_open()) {
-        console::info(std::string(
-                    "Performance information will be saved in the file "
-                    ).append(profileConfigName).c_str());
-        while (_window.isOpen()) {
+    // Run the game and save the performance profile
+    if (profile and profileFile.is_open())
+    {
+        console::info(
+                "Performance information will be saved in the file "
+                + performanceFile);
+
+        while (_window.isOpen())
+        {
             _frame();
-    
+
             // We save the fps each half second
             _fpsTimeTmp = (float) _startTime/ CLOCKS_PER_SEC * 2;
-            if (_fpsTimeTmp > _fpsTime) {
+            if (_fpsTimeTmp > _fpsTime)
+            {
                 _fpsTime = _fpsTimeTmp;
-                int n = 1 / ((float) (_startTime - _lastTime) / CLOCKS_PER_SEC);
+                int n =
+                    1 / ((float) (_startTime - _lastTime) / CLOCKS_PER_SEC
+                        );
                 fps.push(n);
                 fpsTotalCount++;
                 fpsTotal += n;
@@ -78,18 +116,26 @@ void Game::run(bool profile, char profileConfigName[]) {
 
         // Writing all fps and fps average into the profile file
         profileFile.put('\n');
-        for ( ; !fps.empty() ; ) {
+        while (!fps.empty())
+        {
             profileFile << fps.front() << ' ';
             fps.pop();
         }
-        if (fpsTotalCount == 0) {
+        if (fpsTotalCount == 0)
+        {
             profileFile << "Average: " << 0;
-        } else {
+        }
+        else
+        {
             profileFile << "Average: " << fpsTotal / fpsTotalCount;
         }
         profileFile.close();
-    } else {
-        while (_window.isOpen()) {
+    }
+    // Run the game normally
+    else
+    {
+        while (_window.isOpen())
+        {
             _frame();
         }
     }
@@ -97,14 +143,17 @@ void Game::run(bool profile, char profileConfigName[]) {
 
 // As this function is executed each frame, we need to have the best
 // performance. So we inline it to avoid a function call
-inline void Game::_frame() {
+inline void Game::_frame()
+{
     _lastTime = _startTime;
     _startTime = clock();
-    int diffTime = _startTime-_lastTime;
+    _diffTime = _startTime-_lastTime;
 
     sf::Event event;
-    while (_window.pollEvent(event)) {
-        if (event.type == sf::Event::Closed) {
+    while (_window.pollEvent(event))
+    {
+        if (event.type == sf::Event::Closed)
+        {
             _window.close();
         }
     }
@@ -113,53 +162,53 @@ inline void Game::_frame() {
        Misc part
 
        TODO Change the name of this part to be more explanatory
-       */
+     */
     _playerCoordinatesText.setString(
             "X: " + std::to_string(_playerCharacter->getX()) +
             ", Y: " + std::to_string(_playerCharacter->getY()
                 ));
     _fpsText.setString(std::to_string(
-                (int) ( 1 / (float) ((float)(diffTime + _sleepTime) / (float)CLOCKS_PER_SEC) )
+                (int) ( 1 / (float) ((float)(_diffTime + _sleepTime) / (float)CLOCKS_PER_SEC) )
                 ));
 
     /*
        Input part
-       */
+     */
+    float playerX(0);
+    float playerY(0);
+    float moveSpeed(150*(float) ((float)(_diffTime + _sleepTime) / (float)CLOCKS_PER_SEC));
     // The character moves 10 pixels per second in the corresponding direction
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left)) {
-        _playerCharacter->move(-150*
-                (float) ((float)(diffTime + _sleepTime) / (float)CLOCKS_PER_SEC)
-                , 0);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+    {
+        playerX -= moveSpeed;
     }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right)) {
-        _playerCharacter->move(150*
-                (float) ((float)(diffTime + _sleepTime) / (float)CLOCKS_PER_SEC)
-                , 0);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+    {
+        playerX += moveSpeed;
     }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down)) {
-        _playerCharacter->move(0,
-                150*(float) ((float)(diffTime + _sleepTime) / (float)CLOCKS_PER_SEC)
-                );
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+    {
+        playerY += moveSpeed;
     }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up)) {
-        _playerCharacter->move(0,
-                -150*(float) ((float)(diffTime + _sleepTime) / (float)CLOCKS_PER_SEC)
-                );
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+    {
+        playerY -= moveSpeed;
     }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1)) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
+    {
         // The user now controls _person1
         _playerCharacter = &_person1;
     }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2)) {
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
+    {
         // The user now controls _person2
         _playerCharacter = &_person2;
     }
+    _playerCharacter->move(playerX, playerY);
 
-    /*
-       Display part
-       */
     _window.clear(sf::Color::White);
 
+    _world->draw(_window);
     _person1.draw(_window);
     _person2.draw(_window);
     _window.draw(_playerCoordinatesText);
@@ -169,8 +218,8 @@ inline void Game::_frame() {
 
     /*
        Sleep a certain amount of time in order to have a fps limit
-       */
-    _sleepTime = int (1.f / 60 * CLOCKS_PER_SEC - diffTime);
+     */
+    _sleepTime = int (1.f / 60 * CLOCKS_PER_SEC - _diffTime);
     std::this_thread::sleep_for(
             std::chrono::duration<int, std::ratio<1, CLOCKS_PER_SEC>>(_sleepTime)
             );
