@@ -1,5 +1,4 @@
 #deftile
-<<<<<<< HEAD
 0 air
 1 grass
 2 dirt
@@ -18,9 +17,3 @@
 2 2 2 1 1 0 0 1 1 2
 2 2 2 2 2 1 1 2 2 2
 #fedworld
-=======
-0: air.png
-1: grass.png
-2: dirt.png
-#enddef
->>>>>>> 1736899e611a221d576658346b8ca07ab562d72a
