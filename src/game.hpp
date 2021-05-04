@@ -11,14 +11,15 @@
 /*
    Represents the entire game.
    */
-class Game {
+class Game
+{
     public:
         Game();
 
         /*
            Starts the game.
            */
-        void run(bool profile, char profileConfigName[]);
+        void run(bool profile, const std::string& profileConfigName);
 
     protected:
         /*
@@ -64,6 +65,11 @@ class Game {
         clock_t _lastTime;
 
         /*
+           Difference between _startTime and _lastTime.
+           */
+        int _diffTime;
+
+        /*
            These two variables are used to avoid getting the fps for each
            frame.
            Look at the cpp file for more information.
@@ -78,17 +84,22 @@ class Game {
         int _sleepTime;
 
         /*
-           Points to the character the user controls.
-           */
-        Character* _playerCharacter;
-
-        /*
            Defining two person for now.
 
            TODO Search for an optimized way to create and handle many characters
            */
         Character _person1;
         Character _person2;
+
+        /*
+           Points to the character the user controls.
+           */
+        Character* _playerCharacter;
+
+        /*
+           The world in which the user currently plays.
+           */
+        std::unique_ptr<World> _world;
 };
 
 #endif
