@@ -11,17 +11,26 @@
 /* Defines the mode the parser is in. It corresponds to the section of the file
    (#deftile, #defworld…).
  */
-// The default mode. When the parser is in this mode, it searches a section
-// keyword
-#define MODE_ROOT 0
-// The mode corresponding to #deftile
-#define MODE_DEFTILE 1
-// The mode corresponding to #defworld
-#define MODE_DEFWORLD 2
+enum class Mode
+{
+    MODE_ROOT,
+    MODE_DEFTILE,
+    MODE_DEFWORLD
+};
 
-World worldFileParser::parse(const char fileName[]) {
+// TODO change variable name and documentation in order to be more
+// understandable
+
+void wfp::parse(
+        const std::string filename,
+        float& width,
+        float& height,
+        std::vector<int>& intTiles,
+        std::unique_ptr<std::unordered_map<int, std::string>>& tileMap
+        )
+{
     // The world file
-    std::fstream worldFile(fileName, std::fstream::in);
+    std::fstream worldFile(filename, std::fstream::in);
 
     // Contains the character we are currently reading in the file
     char c;
@@ -30,33 +39,26 @@ World worldFileParser::parse(const char fileName[]) {
     std::string word;
 
     // Mode of the parser
-    int mode(MODE_ROOT);
-
-    // A std::map that contains all tile images
-    std::unique_ptr<std::unordered_map<int, std::string>> tileMap =
-        std::make_unique<std::unordered_map<int, std::string>>();
+    Mode mode(Mode::MODE_ROOT);
 
     // Used in MODE_TILEDEF
     // Key to the corresponding tile images
-    int tileKey;
+    int tileKey(0);
 
     // Used in MODE_TILEDEF
     // Indicates whether tileKey is set or no
     bool tileKeySet(false);
 
-    // Height and width total size of the world
-    unsigned int tileArrayHeight(0);
-    unsigned int tileArrayWidth(0);
-    unsigned int tileArraySize(0);
+    // Total size of the world
+    unsigned int tilesArraySize(0);
 
-    bool tileArrayOverflow(false);
 
-    // Contains all tiles of the world
-    // Point to an array
-    std::unique_ptr<int[]> tileArray(nullptr);
+    // Set to true when the world file has defined more tiles
+    // than width * height
+    bool tilesArrayOverflow(false);
 
-    // Number of tile set in tileArray
-    unsigned int tileArrayNb(0);
+    // Number of tiles defined in the world file at this moment
+    unsigned int tilesCount(0);
 
     // Used in MODE_DEFWORLD
     // Used to read the height/width in the file then to go directly in the
@@ -64,89 +66,102 @@ World worldFileParser::parse(const char fileName[]) {
     bool gettingHeight(true);
     bool gettingWidth(true);
 
+    tileMap = std::make_unique<std::unordered_map<int, std::string>>();
+
     // Analyzes the content of the file and sets the variables according to it
     // TODO Optimize the code
-    if (worldFile.is_open()) {
-        while (!worldFile.eof()) {
+    if (worldFile.is_open())
+    {
+        // We read until we are at the end of the file
+        while (!worldFile.eof())
+        {
             c = worldFile.get();
-            if (mode == MODE_DEFWORLD) {
-                if (IS_BLANK(c) and !word.empty()) {
-                    if (gettingWidth) {
+            if (mode == Mode::MODE_DEFWORLD)
+            {
+                // Executed when we have the full word
+                if (IS_BLANK(c) and !word.empty())
+                {
+                    if (gettingWidth)
+                    {
                         gettingWidth = false;
-                        tileArrayWidth = std::stoi(word);
+                        width = std::stof(word);
                     }
-                    else if (gettingHeight) {
+                    else if (gettingHeight)
+                    {
                         gettingHeight = false;
-                        tileArrayHeight = std::stoi(word);
+                        height = std::stof(word);
                         // We now have the world width and the world height so
-                        // we can create the world array
-                        tileArraySize = tileArrayWidth * tileArrayHeight;
-                        tileArray = std::make_unique<int[]>(tileArraySize);
-                        // Setting all tile to 0 as default
-                        // TODO Add the possibility to change the default tile
-                        for (int i = tileArraySize-1 ; i >= 0 ; i--) {
-                            tileArray[i] = 0;
-                        }
+                        // we can create the array of Tiles
+                        tilesArraySize = width * height;
+                        intTiles.reserve(tilesArraySize);
                     }
-                    else {
-                        if (word == "#fedworld") {
-                            mode = MODE_ROOT;
+                    else
+                    {
+                        if (word == "#fedworld")
+                        {
+                            mode = Mode::MODE_ROOT;
                         }
-                        else if (not tileArrayOverflow) {
-                            tileArray[tileArrayNb] = std::stoi(word);
-                            tileArrayNb++;
-                            if (tileArrayNb > tileArraySize) {
-                                tileArrayOverflow = true;
-                                console::warning("WorldFileParser: Size of world\
- than width and/or height. Ignoring next tiles.");
+                        // We add the intTile to intTiles vector
+                        else if (not tilesArrayOverflow)
+                        {
+                            intTiles.push_back(std::stof(word));
+                            tilesCount++;
+                            if (tilesCount > tilesArraySize)
+                            {
+                                tilesArrayOverflow = true;
                             }
                         }
                     }
+                    word.clear();
+                }
+                else
+                {
+                    word += c;
                 }
             }
-            if (IS_BLANK(c)) {
-                if (!word.empty()) {
-                    switch (mode) {
-                        case (MODE_ROOT):
-                            if (word == "#deftile") {
-                                mode = MODE_DEFTILE;
+            else if (IS_BLANK(c))
+            {
+                if (!word.empty())
+                {
+                    if (mode == Mode::MODE_ROOT)
+                    {
+                        if (word == "#deftile")
+                        {
+                            mode = Mode::MODE_DEFTILE;
+                        }
+                        else if (word == "#defworld")
+                        {
+                            mode = Mode::MODE_DEFWORLD;
+                        }
+                    }
+                    else if (mode == Mode::MODE_DEFTILE)
+                    {
+                        if (word == "#fedtile")
+                        {
+                            mode = Mode::MODE_ROOT;
+                        }
+                        else
+                        {
+                            if (tileKeySet)
+                            {
+                                (*tileMap)[tileKey] = word;
+                                tileKeySet = !tileKeySet;
                             }
-                            else if (word == "#defworld") {
-                                mode = MODE_DEFWORLD;
+                            else
+                            {
+                                tileKey = std::stof(word);
+                                tileKeySet = !tileKeySet;
                             }
-                            break;
-
-                        case (MODE_DEFTILE):
-                            if (word == "#fedtile") {
-                                mode = MODE_ROOT;
-                            }
-                            else {
-                                if (tileKeySet) {
-                                    (*tileMap)[tileKey] = word;
-                                    tileKeySet = !tileKeySet;
-                                }
-                                else {
-                                    tileKey = std::stoi(word);
-                                    tileKeySet = !tileKeySet;
-                                }
-                            }
-                            break;
+                        }
                     }
                 }
                 word.clear();
             }
-            else {
+            else
+            {
                 word += c;
             }
         }
         worldFile.close();
     }
-    // If we can't read the file we return an empty World
-    else {
-        console::error(std::string("Cannot load file ").append(fileName).c_str());
-        return World(0, 0, tileArray.release(), tileMap.release());
-    }
-
-
-    return World(tileArrayWidth, tileArrayHeight, tileArray.release(), tileMap.release());
 }
