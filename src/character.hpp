@@ -2,54 +2,46 @@
 #define DEF_CHARACTER
 
 #include <SFML/Graphics.hpp>
+#include "world.hpp"
 
 /*
    Represent a game character.
-   */
-class Character {
+ */
+class Character
+{
     public:
         Character();
 
         /*
-           Draw the character inside window.
-           */
-        void draw(sf::RenderWindow &window) const;
+           Draws the character inside window.
+         */
+        void draw(sf::RenderWindow& window) const;
 
         /*
-           Set the texture of the character.
-           */
-        void setTexture(sf::Texture &texture);
+           Sets the texture of the character.
+         */
+        void setTexture(sf::Texture& texture);
 
         /*
-           Move the character according to the offsets.
-           */
-        void move(int offsetX, int offsetY);
+           Moves the character according to the offsets.
+         */
+        void move(float offsetX, float offsetY);
 
         /*
-           Return the x absolute coordinate of the character.
-           */
-        int getX() const;
+           Returns the x absolute coordinate of the character.
+         */
+        float getX() const;
 
         /*
-           Return the y absolute coordinate of the character.
-           */
-        int getY() const;
+           Returns the y absolute coordinate of the character.
+         */
+        float getY() const;
 
     protected:
         /*
            The sprite of the character.
-           */
+         */
         sf::Sprite _sprite;
-
-        /*
-           Absolute x coordinate.
-           */
-        int _x;
-
-        /*
-           Absolute y coordinate.
-           */
-        int _y;
 };
 
 #endif

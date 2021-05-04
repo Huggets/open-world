@@ -1,35 +1,105 @@
 #ifndef GAME_HPP
 #define GAME_HPP
 
-#include "engine.hpp"
+#include <unordered_map>
+#include <string>
+#include <memory>
+#include <SFML/Graphics.hpp>
+#include "world.hpp"
+#include "character.hpp"
 
 /*
-   Represent the whole game.
-
-   It contains the engine that handles almost everything (loading ressources,
-   drawing on the window, managing characters…)
+   Represents the entire game.
    */
-class Game {
+class Game
+{
     public:
         Game();
-        ~Game();
 
         /*
-           Main function of the game that call each frame function of the engine
-           in an infinite loop.
+           Starts the game.
            */
-        void run();
+        void run(bool profile, const std::string& profileConfigName);
 
     protected:
         /*
-           The game engine that handles almost everything.
+           Method that will be executed each frame of the game.
            */
-        Engine _engine;
+        inline void _frame();
 
         /*
-           Indicate whether the game is running or not.
+           The main window that display the game.
            */
-        bool _stillRunning;
+        sf::RenderWindow _window;
+
+        /*
+           Unordored map that store every textures
+           */
+        std::unordered_map<std::string, std::unique_ptr<sf::Texture>>  _textures;
+
+        /*
+           The font used to display text.
+           */
+        sf::Font _font;
+
+        /*
+           Stores the coordinates of the character the player control.
+           */
+        sf::Text _playerCoordinatesText;
+
+        /*
+           Text that displays the frames per seconds.
+           */
+        sf::Text _fpsText;
+
+        /*
+           Stores the processor time consumed at the start of the current
+           _frame function that is executed.
+           */
+        clock_t _startTime;
+
+        /*
+           Stores the processor time consumed at the start of the last
+           _frame function that was executed.
+           */
+        clock_t _lastTime;
+
+        /*
+           Difference between _startTime and _lastTime.
+           */
+        int _diffTime;
+
+        /*
+           These two variables are used to avoid getting the fps for each
+           frame.
+           Look at the cpp file for more information.
+           */
+        int _fpsTime;
+        int _fpsTimeTmp;
+
+        /*
+           Time the function frame waits at the end of each call in order to
+           have a fps limit.
+           */
+        int _sleepTime;
+
+        /*
+           Defining two person for now.
+
+           TODO Search for an optimized way to create and handle many characters
+           */
+        Character _person1;
+        Character _person2;
+
+        /*
+           Points to the character the user controls.
+           */
+        Character* _playerCharacter;
+
+        /*
+           The world in which the user currently plays.
+           */
+        std::unique_ptr<World> _world;
 };
 
 #endif

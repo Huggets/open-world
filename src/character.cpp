@@ -1,29 +1,85 @@
 #include "character.hpp"
+#include <iostream>
 
 Character::Character() :
-    _x(0),
-    _y(0)
+    _sprite()
 {
 }
 
-void Character::draw(sf::RenderWindow &window) const {
+void Character::draw(sf::RenderWindow& window) const
+{
     window.draw(_sprite);
 }
 
-void Character::setTexture(sf::Texture &texture) {
+void Character::setTexture(sf::Texture& texture)
+{
     _sprite.setTexture(texture);
+    _sprite.setOrigin(
+            _sprite.getTextureRect().width/2,
+            _sprite.getTextureRect().height/2
+            );
 }
 
-void Character::move(int offsetX, int offsetY) {
-    _x = _x + offsetX;
-    _y = _y + offsetY;
+void Character::move(float offsetX, float offsetY)
+{
+    
+    int direction = Direction::NONE;
+    if (offsetX < 0)
+    {
+        direction = Direction::WEST;
+    }
+    else if (offsetX > 0)
+    {
+        direction = Direction::EAST;
+    }
+    if (offsetY < 0)
+    {
+        direction =  static_cast<int>(Direction::NORTH) + direction;
+    }
+    else if (offsetY > 0)
+    {
+        direction = static_cast<int>(Direction::SOUTH) + direction;
+    }
+
+    switch (direction)
+    {
+        case (Direction::NORTH):
+            _sprite.setRotation(0);
+            break;
+        case (Direction::SOUTH):
+            _sprite.setRotation(180);
+            break;
+        case (Direction::EAST):
+            _sprite.setRotation(90);
+            break;
+        case (Direction::WEST):
+            _sprite.setRotation(-90);
+            break;
+        case (Direction::NORTH | Direction::EAST):
+            _sprite.setRotation(45);
+            break;
+        case (Direction::NORTH | Direction::WEST):
+            _sprite.setRotation(-45);
+            break;
+        case (Direction::SOUTH | Direction::EAST):
+            _sprite.setRotation(135);
+            break;
+        case (Direction::SOUTH | Direction::WEST):
+            _sprite.setRotation(-135);
+            break;
+        default:
+            break;
+    }
+
     _sprite.move(offsetX, offsetY);
 }
 
-int Character::getX() const {
-    return _x;
+float Character::getX() const
+{
+    return _sprite.getPosition().x;
 }
 
-int Character::getY() const {
-    return _y;
+float Character::getY() const
+{
+    return _sprite.getPosition().y;
 }
