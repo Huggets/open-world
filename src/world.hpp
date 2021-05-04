@@ -3,64 +3,63 @@
 
 #include <memory>
 #include <unordered_map>
+#include <vector>
 #include <string>
+#include <SFML/Graphics.hpp>
+#include "tile.hpp"
 
 /*
    Represents the world where the characters lives.
-   */
-class World {
+ */
+class World
+{
     public:
         World(
-                int width,
-                int height,
-                int tileArray[],
-                std::unordered_map<int, std::string>* tileConverter
-                );
+                unsigned int width,
+                unsigned int height,
+                std::unique_ptr<Tile[]>& tiles
+             );
 
         /*
            Returns the width of the world.
-           */
-        int getWidth() const;
+         */
+        unsigned int getWidth() const;
 
         /*
            Returns the heigth of the world.
-           */
-        int getHeight() const;
+         */
+        unsigned int getHeight() const;
 
         /*
-           Returns the tile at the given coordinate.
-
-           Returns the default tile (0 for now), if we try to access a tile
-           which is outside the world.
-           */
-        int getTile(int x, int y) const;
-
-        /*
-           Returns the name of the ressource corresponding to the tile.
-           */
-        std::string getTileRessource(int tileKey) const;
+           Draw the tiles on the window.
+         */
+        void draw(sf::RenderWindow& window);
 
     protected:
         /*
            Width of the world.
-           */
-        int _width;
+         */
+        unsigned int _width;
 
         /*
            Height of the world.
-           */
-        int _height;
+         */
+        unsigned int _height;
 
         /*
-           Points to the array which contains all the tiles of the world.
-           */
-        std::unique_ptr<int[]> _tileArray;
+           Points to the one dimensional array which contains all the tiles
+           of the world.
+         */
+        std::unique_ptr<Tile[]> _tiles;
+};
 
-        /*
-           The key is the number of the tile and the string is the name of the
-           corresponding texture.
-           */
-        std::unique_ptr<std::unordered_map<int, std::string>> _tileConverter;
+enum Direction
+{
+    NONE  = 0b0000,
+    NORTH = 0b0001,
+    SOUTH = 0b0010,
+    EAST  = 0b0100,
+    WEST  = 0b1000
 };
 
 #endif
