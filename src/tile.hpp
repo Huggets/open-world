@@ -20,7 +20,7 @@ class Tile
            Returns the width of the tile.
          */
         float getWidth() const;
-        
+
         /*
            Returns the height of the tile.
          */
@@ -35,6 +35,11 @@ class Tile
            Sets the texture of the tile.
          */
         void setTexture(sf::Texture* texture);
+
+        /*
+           TODO Doc
+         */
+        bool isGround() const;
 
     protected:
         /*
@@ -56,6 +61,11 @@ class Tile
            The y coordinate of the tile.
          */
         float _y;
+
+        /*
+           TODO Doc
+         */
+        bool _isGround;
 
         /*
            The shape that represent the tile.

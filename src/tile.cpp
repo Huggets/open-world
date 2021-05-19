@@ -5,6 +5,7 @@ Tile::Tile() :
      _height(32.f),
      _x(0.f),
      _y(0.f),
+     _isGround(true),
     _shape(sf::Vector2f(32.f, 32.f))
 {
 }
@@ -34,4 +35,9 @@ void Tile::setPosition(float x, float y)
 void Tile::setTexture(sf::Texture* texture)
 {
     _shape.setTexture(texture);
+}
+
+bool Tile::isGround() const
+{
+    return _isGround;
 }
