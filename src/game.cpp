@@ -24,48 +24,34 @@ Game::Game() :
     _sleepTime(0),
     _person1(),
     _person2(),
-    _playerCharacter(&_person1)
+    _playerCharacter(&_person1),
+    _world(nullptr)
 {
     /*
        Loading files
      */
-    _textures["person"] = std::make_unique<sf::Texture>();
-    _textures["person"]->loadFromFile("data/images/person-top.png");
-    _textures["dirt"] = std::make_unique<sf::Texture>();
-    _textures["dirt"]->loadFromFile("data/images/dirt.png");
-    _textures["grass"] = std::make_unique<sf::Texture>();
-    _textures["grass"]->loadFromFile("data/images/grass.png");
 
     // FONTS
     _font.loadFromFile("data/fonts/linbiolum.otf");
 
     // WORLDS
-    // Getting information from a world file
+    // Generating the world
     const std::string worldFilename("data/worlds/world1.world");
-    float width(0);
-    float height(0);
-    std::unique_ptr<std::unordered_map<int, std::string>> tileMap;
-    std::vector<int> intTiles;
-    wfp::parse(worldFilename, width, height, intTiles, tileMap);
+    _world = wfp::parse(worldFilename, _textures);
 
-    // Creating the appropriate World object
-    auto tiles = std::make_unique<Tile[]>(width*height);
-    for (float y = 0, n = 0 ; y < height ; y++ )
+    // TEXTURES
+    for (auto p : _textures)
     {
-        for (float x = 0 ; x < width ; x++, n++ )
-        {
-            Tile& tile = tiles[n];
-            tile.setPosition(x*tile.getWidth(), y*tile.getHeight());
-            tile.setTexture(_textures[tileMap->at(intTiles[n])].get());
-        }
+        _textures[p.first].loadFromFile("data/images/" + p.first + ".png");
     }
-    _world = std::make_unique<World>(width, height, tiles);
+    _textures["person"] = sf::Texture();
+    _textures["person"].loadFromFile("data/images/person-top.png");
 
     /*
        Default settings
      */
-    _person1.setTexture(*_textures["person"]);
-    _person2.setTexture(*_textures["person"]);
+    _person1.setTexture(_textures["person"]);
+    _person2.setTexture(_textures["person"]);
     _playerCoordinatesText.setFont(_font);
     _playerCoordinatesText.setPosition(0, 570);
     _playerCoordinatesText.setFillColor(sf::Color::Black);
@@ -203,6 +189,17 @@ inline void Game::_frame()
     {
         // The user now controls _person2
         _playerCharacter = &_person2;
+    }
+
+    float tmp_playerX(playerX + _playerCharacter->getX());
+    float tmp_playerY(playerY + _playerCharacter->getY());
+    if (tmp_playerX < 0 or tmp_playerX > _world->getWidth()*32)
+    {
+        playerX = 0;
+    }
+    if (tmp_playerY < 0 or tmp_playerY > _world->getHeight()*32)
+    {
+        playerY = 0;
     }
     _playerCharacter->move(playerX, playerY);
 
