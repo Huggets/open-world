@@ -21,12 +21,9 @@ enum class Mode
 // TODO change variable name and documentation in order to be more
 // understandable
 
-void wfp::parse(
+std::unique_ptr<World> wfp::parse(
         const std::string filename,
-        float& width,
-        float& height,
-        std::vector<int>& intTiles,
-        std::unique_ptr<std::unordered_map<int, std::string>>& tileMap
+        std::unordered_map<std::string, sf::Texture>& texturesMap
         )
 {
     // The world file
@@ -41,6 +38,9 @@ void wfp::parse(
     // Mode of the parser
     Mode mode(Mode::MODE_ROOT);
 
+    // Pointer to the array of the world tiles
+    std::unique_ptr<Tile[]> tiles;
+
     // Used in MODE_TILEDEF
     // Key to the corresponding tile images
     int tileKey(0);
@@ -54,19 +54,27 @@ void wfp::parse(
 
 
     // Set to true when the world file has defined more tiles
-    // than width * height
+    // than worldWidth * worldHeight
     bool tilesArrayOverflow(false);
 
     // Number of tiles defined in the world file at this moment
     unsigned int tilesCount(0);
 
     // Used in MODE_DEFWORLD
-    // Used to read the height/width in the file then to go directly in the
+    // Used to read the worldHeight/worldWidth in the file then to go directly in the
     // corresponding block of code
     bool gettingHeight(true);
     bool gettingWidth(true);
 
-    tileMap = std::make_unique<std::unordered_map<int, std::string>>();
+    float worldWidth(0);
+    float worldHeight(0);
+
+    // Coordinate of the tile we adding.
+    float xTile(0);
+    float yTile(0);
+
+    // Return the name of the tile represented by an int
+    std::unordered_map<int, std::string> intsName;
 
     // Analyzes the content of the file and sets the variables according to it
     // TODO Optimize the code
@@ -84,16 +92,16 @@ void wfp::parse(
                     if (gettingWidth)
                     {
                         gettingWidth = false;
-                        width = std::stof(word);
+                        worldWidth = std::stof(word);
                     }
                     else if (gettingHeight)
                     {
                         gettingHeight = false;
-                        height = std::stof(word);
+                        worldHeight = std::stof(word);
                         // We now have the world width and the world height so
                         // we can create the array of Tiles
-                        tilesArraySize = width * height;
-                        intTiles.reserve(tilesArraySize);
+                        tilesArraySize = worldWidth * worldHeight;
+                        tiles = std::make_unique<Tile[]>(tilesArraySize);
                     }
                     else
                     {
@@ -104,7 +112,16 @@ void wfp::parse(
                         // We add the intTile to intTiles vector
                         else if (not tilesArrayOverflow)
                         {
-                            intTiles.push_back(std::stof(word));
+                            tiles[tilesCount].setTexture(&texturesMap[
+                                    intsName[std::stoul(word)]
+                            ]);
+                            tiles[tilesCount].setPosition(xTile, yTile);
+                            xTile += tiles[tilesCount].getWidth();
+                            if (xTile/tiles[tilesCount].getWidth() >= worldWidth)
+                            {
+                                xTile = 0;
+                                yTile += tiles[tilesCount].getHeight();
+                            }
                             tilesCount++;
                             if (tilesCount > tilesArraySize)
                             {
@@ -144,7 +161,8 @@ void wfp::parse(
                         {
                             if (tileKeySet)
                             {
-                                (*tileMap)[tileKey] = word;
+                                intsName[tileKey] = word;
+                                texturesMap[word] = sf::Texture();
                                 tileKeySet = !tileKeySet;
                             }
                             else
@@ -164,4 +182,6 @@ void wfp::parse(
         }
         worldFile.close();
     }
+
+    return std::make_unique<World>(worldWidth, worldHeight, tiles);
 }
