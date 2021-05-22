@@ -55,7 +55,7 @@ std::unique_ptr<World> wfp::parse(
 
     // Set to true when the world file has defined more tiles
     // than worldWidth * worldHeight
-    bool tilesArrayOverflow(false);
+    bool tilesArrayFilled(false);
 
     // Number of tiles defined in the world file at this moment
     unsigned int tilesCount(0);
@@ -73,7 +73,7 @@ std::unique_ptr<World> wfp::parse(
     float xTile(0);
     float yTile(0);
 
-    // Return the name of the tile represented by an int
+    // Returns the name of the tile represented by an int
     std::unordered_map<int, std::string> intsName;
 
     // Analyzes the content of the file and sets the variables according to it
@@ -110,7 +110,7 @@ std::unique_ptr<World> wfp::parse(
                             mode = Mode::MODE_ROOT;
                         }
                         // We add the intTile to intTiles vector
-                        else if (not tilesArrayOverflow)
+                        else if (not tilesArrayFilled)
                         {
                             tiles[tilesCount].setTexture(&texturesMap[
                                     intsName[std::stoul(word)]
@@ -123,9 +123,9 @@ std::unique_ptr<World> wfp::parse(
                                 yTile += tiles[tilesCount].getHeight();
                             }
                             tilesCount++;
-                            if (tilesCount > tilesArraySize)
+                            if (tilesCount >= tilesArraySize)
                             {
-                                tilesArrayOverflow = true;
+                                tilesArrayFilled = true;
                             }
                         }
                     }
@@ -181,6 +181,13 @@ std::unique_ptr<World> wfp::parse(
             }
         }
         worldFile.close();
+    }
+    else
+    {
+        std::string message("Cannot open world file '");
+        message += filename;
+        message += "'.";
+        console::error(message);
     }
 
     return std::make_unique<World>(worldWidth, worldHeight, tiles);
