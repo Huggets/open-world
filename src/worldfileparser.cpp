@@ -77,7 +77,7 @@ std::unique_ptr<World> wfp::parse(
     std::unordered_map<int, std::string> intsName;
 
     // Analyzes the content of the file and sets the variables according to it
-    // TODO Optimize the code
+    // TODO Optimize the code to be more readable
     if (worldFile.is_open())
     {
         // We read until we are at the end of the file

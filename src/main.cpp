@@ -10,7 +10,6 @@ int main(int argc, char** argv)
     std::string performanceFilename("data/profiles/profile.latest");
     std::string worldFilename("data/worlds/world1.world");
 
-    // TODO Finish the help menu
     for (int i = 1 ; i < argc ; i++)
     {
         // If the argument is -h or --help we display the help menu
@@ -19,7 +18,17 @@ int main(int argc, char** argv)
                 strcmp(argv[i], "-h") == 0
            )
         {
-            std::cout << "Display help" << std::endl;
+            std::string message("Usage: ");
+            message += argv[0];
+            message += " [--help]";
+            message += " [--profile FILE]";
+            message += " [--world FILE]";
+            message += "\n\n";
+            message += "  -h, --help         Display this help message\n";
+            message += "  -p, --profile FILE Save a performance profile into FILE\n";
+            message += "  -w, --world FILE   Load FILE and use it as the playable world\n";
+            message += "\n";
+            std::cout << message;
             return 0;
         }
         // If the argument is -p or --profile we will store information about

@@ -12,10 +12,11 @@
 
 Game::Game(const std::string& worldFilename) :
     _window(sf::VideoMode(800, 600), "Open World", sf::Style::Close),
-    _textures(),
     _font(),
     _playerCoordinatesText(),
     _fpsText(),
+    _textures(),
+    _world(nullptr),
     _startTime(clock()),
     _lastTime(_startTime),
     _diffTime(0),
@@ -24,8 +25,7 @@ Game::Game(const std::string& worldFilename) :
     _sleepTime(0),
     _person1(),
     _person2(),
-    _playerCharacter(&_person1),
-    _world(nullptr)
+    _playerCharacter(&_person1)
 {
     /*
        Loading files
@@ -134,6 +134,7 @@ inline void Game::_frame()
     _startTime = clock();
     _diffTime = _startTime-_lastTime;
 
+    // Handle the window events
     sf::Event event;
     while (_window.pollEvent(event))
     {
@@ -144,40 +145,25 @@ inline void Game::_frame()
     }
 
     /*
-       Misc part
-
-       TODO Change the name of this part to be more explanatory
-     */
-    _playerCoordinatesText.setString(
-            "X: " + std::to_string(_playerCharacter->getX()) +
-            ", Y: " + std::to_string(_playerCharacter->getY()
-                ));
-    _fpsText.setString(std::to_string(
-                (int) ( 1 / (float) ((float)(_diffTime + _sleepTime) / (float)CLOCKS_PER_SEC) )
-                ));
-
-    /*
        Input part
      */
-    float playerX(0);
-    float playerY(0);
-    float moveSpeed(150*(float) ((float)(_diffTime + _sleepTime) / (float)CLOCKS_PER_SEC));
-    // The character moves 10 pixels per second in the corresponding direction
+    moveSpeed = 150*(float) ((float)(_diffTime + _sleepTime) / (float)CLOCKS_PER_SEC);
+
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
     {
-        playerX -= moveSpeed;
+        _tmpPlayerX = _playerCharacter->getX() - moveSpeed;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
     {
-        playerX += moveSpeed;
+        _tmpPlayerX = _playerCharacter->getX() + moveSpeed;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
     {
-        playerY += moveSpeed;
+        _tmpPlayerY = _playerCharacter->getY() + moveSpeed;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
     {
-        playerY -= moveSpeed;
+        _tmpPlayerY = _playerCharacter->getY() - moveSpeed;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
     {
@@ -190,18 +176,32 @@ inline void Game::_frame()
         _playerCharacter = &_person2;
     }
 
-    float tmp_playerX(playerX + _playerCharacter->getX());
-    float tmp_playerY(playerY + _playerCharacter->getY());
-    if (tmp_playerX < 0 or tmp_playerX > _world->getWidth()*32)
-    {
-        playerX = 0;
-    }
-    if (tmp_playerY < 0 or tmp_playerY > _world->getHeight()*32)
-    {
-        playerY = 0;
-    }
-    _playerCharacter->move(playerX, playerY);
+    /*
+       Main part
+     */
+    // Displaying texts
+    _playerCoordinatesText.setString(
+            "X: " + std::to_string(_playerCharacter->getX()) +
+            ", Y: " + std::to_string(_playerCharacter->getY()
+                ));
+    _fpsText.setString(std::to_string(
+                (int) ( 1 / (float) ((float)(_diffTime + _sleepTime) / (float)CLOCKS_PER_SEC) )
+                ));
 
+    // Player's moves
+    if (_tmpPlayerX < 0 or _tmpPlayerX > _world->getWidth()*32)
+    {
+        _tmpPlayerX = _playerCharacter->getX();
+    }
+    if (_tmpPlayerY < 0 or _tmpPlayerY > _world->getHeight()*32)
+    {
+        _tmpPlayerY = _playerCharacter->getY();
+    }
+    _playerCharacter->setPosition(_tmpPlayerX, _tmpPlayerY);
+
+    /*
+       Drawing part
+     */
     _window.clear(sf::Color::White);
 
     _world->draw(_window);
