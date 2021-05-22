@@ -10,7 +10,7 @@
 #include "console.hpp"
 #include "worldfileparser.hpp"
 
-Game::Game() :
+Game::Game(const std::string& worldFilename) :
     _window(sf::VideoMode(800, 600), "Open World", sf::Style::Close),
     _textures(),
     _font(),
@@ -36,7 +36,6 @@ Game::Game() :
 
     // WORLDS
     // Generating the world
-    const std::string worldFilename("data/worlds/world1.world");
     _world = wfp::parse(worldFilename, _textures);
 
     // TEXTURES
