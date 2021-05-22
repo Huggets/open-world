@@ -14,7 +14,7 @@
 class Game
 {
     public:
-        Game();
+        Game(const std::string& worldFilename);
 
         /*
            Starts the game.
@@ -35,7 +35,7 @@ class Game
         /*
            Unordored map that store every textures
            */
-        std::unordered_map<std::string, std::unique_ptr<sf::Texture>>  _textures;
+        std::unordered_map<std::string, sf::Texture>  _textures;
 
         /*
            The font used to display text.
