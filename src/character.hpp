@@ -23,9 +23,16 @@ class Character
         void setTexture(sf::Texture& texture);
 
         /*
-           Moves the character according to the offsets.
+           Moves the character and change its direction according
+           to the offsets.
          */
         void move(float offsetX, float offsetY);
+
+        /*
+           Sets the x and y coordinate of the character and change
+           its direction according to them.
+         */
+        void setPosition(float x, float y);
 
         /*
            Returns the x absolute coordinate of the character.
