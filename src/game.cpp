@@ -216,7 +216,7 @@ inline void Game::_frame()
     /*
        Sleep a certain amount of time in order to have a fps limit
      */
-    _sleepTime = int (1.f / 60 * CLOCKS_PER_SEC - _diffTime);
+    _sleepTime = int (1.f / 144 * CLOCKS_PER_SEC - _diffTime);
     std::this_thread::sleep_for(
             std::chrono::duration<int, std::ratio<1, CLOCKS_PER_SEC>>(_sleepTime)
             );
