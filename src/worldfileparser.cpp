@@ -6,128 +6,125 @@
 #include <memory>
 #include "console.hpp"
 
-#define IS_BLANK(x) (x == ' ' or x == '\t' or x == '\n')
-
-/* Defines the mode the parser is in. It corresponds to the section of the file
-   (#deftile, #defworld…).
- */
-enum class Mode
-{
-    MODE_ROOT,
-    MODE_DEFTILE,
-    MODE_DEFWORLD
-};
-
 // TODO change variable name and documentation in order to be more
 // understandable
 
 std::unique_ptr<World> wfp::parse(
         const std::string filename,
-        std::unordered_map<std::string, sf::Texture>& texturesMap
+        std::unordered_map<std::string, sf::Texture>& textures
         )
 {
     // The world file
     std::fstream worldFile(filename, std::fstream::in);
 
-    // Contains the character we are currently reading in the file
+    // The current character that is read
     char c;
 
-    // Contains the last word we are currently reading in the file
+    // The word that is read
     std::string word;
 
-    // Mode of the parser
-    Mode mode(Mode::MODE_ROOT);
-
-    // Pointer to the array of the world tiles
+    // Array of tiles defined in the world file
     std::unique_ptr<Tile[]> tiles;
 
-    // Used in MODE_TILEDEF
-    // Key to the corresponding tile images
-    int tileKey(0);
+    // height of the world defined in the world file
+    unsigned int worldHeight(0);
 
-    // Used in MODE_TILEDEF
-    // Indicates whether tileKey is set or no
-    bool tileKeySet(false);
+    // width of the world defined in the world file
+    unsigned int worldWidth(0);
 
-    // Total size of the world
-    unsigned int tilesArraySize(0);
+    // Store the properties of a tile. The key is the id of the tile
+    std::unordered_map<int, wfp::TileProperties> tilesProperties;
+    
+    // TILE PROPERTY NAME
+    const std::string PROP_TEXTURE_NAME("textureName");
+    const std::string PROP_IS_VOID("isVoid");
 
+    // VARIABLE OF deftile LABEL
+    bool tileIdIsSet(false);
+    int tileArgCount(0);
+    unsigned int tileId(0);
+    std::string tileTextureName;
+    bool tileIsVoid(false);
 
-    // Set to true when the world file has defined more tiles
-    // than worldWidth * worldHeight
-    bool tilesArrayFilled(false);
-
-    // Number of tiles defined in the world file at this moment
+    // VARIABLE OF defworld LABEL
+    bool worldHeightIsSet(false);
+    bool worldWidthIsSet(false);
+    unsigned int worldSize(0);
+    unsigned int rowSize(0);
     unsigned int tilesCount(0);
+    unsigned int tileX(0);
+    unsigned int tileY(0);
 
-    // Used in MODE_DEFWORLD
-    // Used to read the worldHeight/worldWidth in the file then to go directly in the
-    // corresponding block of code
-    bool gettingHeight(true);
-    bool gettingWidth(true);
-
-    float worldWidth(0);
-    float worldHeight(0);
-
-    // Coordinate of the tile we adding.
-    float xTile(0);
-    float yTile(0);
-
-    // Returns the name of the tile represented by an int
-    std::unordered_map<int, std::string> intsName;
 
     // Analyzes the content of the file and sets the variables according to it
-    // TODO Optimize the code to be more readable
     if (worldFile.is_open())
     {
-        // We read until we are at the end of the file
-        while (!worldFile.eof())
+start:
+        while (not worldFile.eof())
         {
             c = worldFile.get();
-            if (mode == Mode::MODE_DEFWORLD)
+            if (c == ' ' or c == '\t' or c == '\n')
             {
-                // Executed when we have the full word
-                if (IS_BLANK(c) and !word.empty())
+                // It means we have a complete word
+                if (word == "StartTiles")
                 {
-                    if (gettingWidth)
+                    word.clear();
+                    goto deftile;
+                }
+                else if (word == "StartWorld")
+                {
+                    word.clear();
+                    goto defworld;
+                }
+                else
+                {
+                    word.clear();
+                }
+            }
+            else
+            {
+                word += c;
+            }
+        }
+
+        goto end;
+
+deftile:
+        while (not worldFile.eof())
+        {
+            c = worldFile.get();
+            if (tileIdIsSet)
+            {
+                if (c == ' ' or c == '\t' or c == '\n')
+                {
+                    // Get the tile texture name
+                    if (tileArgCount == 0 and not word.empty())
                     {
-                        gettingWidth = false;
-                        worldWidth = std::stof(word);
+                        tileTextureName = word;
+                        tileArgCount++;
                     }
-                    else if (gettingHeight)
+                    else if (tileArgCount == 1 and not word.empty())
                     {
-                        gettingHeight = false;
-                        worldHeight = std::stof(word);
-                        // We now have the world width and the world height so
-                        // we can create the array of Tiles
-                        tilesArraySize = worldWidth * worldHeight;
-                        tiles = std::make_unique<Tile[]>(tilesArraySize);
+                        if (word == "true")
+                        {
+                            tileIsVoid = true;
+                        }
                     }
-                    else
+
+                    // If it is an end of line, add the tile definition
+                    // and reset to find another definition or the end
+                    if (c == '\n')
                     {
-                        if (word == "#fedworld")
+                        if (not tileTextureName.empty())
                         {
-                            mode = Mode::MODE_ROOT;
+                            tilesProperties[tileId].textureName = tileTextureName;
+                            textures[tileTextureName] = sf::Texture();
                         }
-                        // We add the intTile to intTiles vector
-                        else if (not tilesArrayFilled)
-                        {
-                            tiles[tilesCount].setTexture(&texturesMap[
-                                    intsName[std::stoul(word)]
-                            ]);
-                            tiles[tilesCount].setPosition(xTile, yTile);
-                            xTile += tiles[tilesCount].getWidth();
-                            if (xTile/tiles[tilesCount].getWidth() >= worldWidth)
-                            {
-                                xTile = 0;
-                                yTile += tiles[tilesCount].getHeight();
-                            }
-                            tilesCount++;
-                            if (tilesCount >= tilesArraySize)
-                            {
-                                tilesArrayFilled = true;
-                            }
-                        }
+                        tilesProperties[tileId].isVoid = tileIsVoid;
+                        tileIdIsSet = false;
+                        tileIsVoid = false;
+                        tileArgCount = 0;
+                        tileTextureName.clear();
                     }
                     word.clear();
                 }
@@ -136,57 +133,131 @@ std::unique_ptr<World> wfp::parse(
                     word += c;
                 }
             }
-            else if (IS_BLANK(c))
+            else
             {
-                if (!word.empty())
+                // Get the tile id
+                if (c == ':')
                 {
-                    if (mode == Mode::MODE_ROOT)
+                    tileId = std::stoul(word);
+                    tileIdIsSet = true;
+                    word.clear();
+                }
+                else if (c == ' ' or c == '\t' or c == '\n')
+                {
+                    // End of tiles definition
+                    if (word == "EndTiles")
                     {
-                        if (word == "#deftile")
+                        word.clear();
+                        goto start;
+                    }
+                    // TODO Make exception for this
+                    console::error("World file: syntax error");
+                    throw std::exception();
+                }
+                else
+                {
+                    word += c;
+                }
+            }
+        }
+
+        goto end;
+
+defworld:
+        while (not worldFile.eof())
+        {
+            c = worldFile.get();
+
+            if (c == ' ' or c == '\t' or c == '\n')
+            {
+                if (word == "EndWorld")
+                {
+                    word.clear();
+                    goto start;
+                }
+
+                if (not worldWidthIsSet)
+                {
+                    worldWidth = std::stoul(word);
+                    worldWidthIsSet = true;
+                    word.clear();
+                }
+                else if (not worldHeightIsSet)
+                {
+                    worldHeight = std::stoul(word);
+                    worldHeightIsSet = true;
+                    worldSize = worldWidth * worldHeight;
+                    tiles = std::make_unique<Tile[]>(worldSize);
+                    word.clear();
+                }
+                else
+                {
+                    if (word.empty())
+                    {
+                        // TODO Optimize this to avoid repetition below
+                        if (c == '\n' and rowSize < worldWidth)
                         {
-                            mode = Mode::MODE_DEFTILE;
-                        }
-                        else if (word == "#defworld")
-                        {
-                            mode = Mode::MODE_DEFWORLD;
+                                // TODO Make exception for this
+                                console::error("World file: row not fully defined");
+                                throw std::exception();
                         }
                     }
-                    else if (mode == Mode::MODE_DEFTILE)
+                    else
                     {
-                        if (word == "#fedtile")
+                        rowSize++;
+
+                        if (c == '\n')
                         {
-                            mode = Mode::MODE_ROOT;
+                            if (rowSize > worldWidth)
+                            {
+                                // TODO Make exception for this
+                                console::error("World file: exceeding world width");
+                                throw std::exception();
+                            }
+                            else if (rowSize < worldHeight)
+                            {
+                                // TODO Make exception for this
+                                console::error("World file: row not fully defined");
+                                throw std::exception();
+                            }
+                            rowSize = 0;
                         }
-                        else
+
+                        Tile* currentTile = &(tiles[tilesCount]);
+
+                        currentTile->setTexture(&textures[
+                                tilesProperties[std::stoul(word)].textureName]);
+                        currentTile->setIsVoid(
+                                tilesProperties[std::stoul(word)].isVoid);
+                        currentTile->setPosition(tileX, tileY);
+                        tileX += currentTile->getWidth();
+                        if (tileX/currentTile->getWidth() >= worldWidth)
                         {
-                            if (tileKeySet)
-                            {
-                                intsName[tileKey] = word;
-                                texturesMap[word] = sf::Texture();
-                                tileKeySet = !tileKeySet;
-                            }
-                            else
-                            {
-                                tileKey = std::stof(word);
-                                tileKeySet = !tileKeySet;
-                            }
+                            tileX = 0;
+                            tileY += currentTile->getHeight();
                         }
+                        tilesCount++;
+                        word.clear();
                     }
                 }
-                word.clear();
             }
             else
             {
                 word += c;
             }
         }
+
+        goto end;
+
+end:
         worldFile.close();
     }
     else
     {
-        std::string message("Cannot open world file '");
+        // TODO Make exception for this
+        std::string message("Cannot open '");
         message += filename;
-        message += "'.";
+        message += "' file.";
         console::error(message);
     }
 
