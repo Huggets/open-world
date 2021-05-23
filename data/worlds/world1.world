@@ -1,10 +1,10 @@
-#deftile
-0 air
-1 grass
-2 dirt
-#fedtile
+StartTiles
+0: air true
+1: grass
+2: dirt
+EndTiles
 
-#defworld
+StartWorld
 8 8
 1 1 1 1 1 1 1 1
 1 1 1 1 1 1 1 1
@@ -14,4 +14,4 @@
 1 1 1 1 1 1 1 1
 1 1 1 1 1 1 1 1
 0 1 1 1 1 1 0 0
-#fedworld
+EndWorld
