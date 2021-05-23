@@ -39,19 +39,14 @@ class Tile
         /*
            TODO Doc
          */
-        bool isGround() const;
+        bool isVoid() const;
+
+        /*
+           TODO Doc
+         */
+        void setIsVoid(bool isVoid);
 
     protected:
-        /*
-           The width of the tile.
-         */
-        float _width;
-
-        /*
-           The height of the tile.
-         */
-        float _height;
-
         /*
            The x coordinate of the tile.
          */
@@ -63,9 +58,19 @@ class Tile
         float _y;
 
         /*
+           The width of the tile.
+         */
+        float _width;
+
+        /*
+           The height of the tile.
+         */
+        float _height;
+
+        /*
            TODO Doc
          */
-        bool _isGround;
+        bool _isVoid;
 
         /*
            The shape that represent the tile.
