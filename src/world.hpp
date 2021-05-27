@@ -38,7 +38,11 @@ class World
          */
         void draw(sf::RenderWindow& window);
 
-        int collide(const Character& character) const;
+        /*
+           Return true if character is colliding, for example if the
+           character is outside the world or is in a void tile
+         */
+        bool collide(const Character& character) const;
 
     protected:
         /*

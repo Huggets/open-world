@@ -33,9 +33,8 @@ void World::draw(sf::RenderWindow& window)
     }
 }
 
-int World::collide(const Character& character) const
+bool World::collide(const Character& character) const
 {
-    int collide_code=0b0;
     if (
             character.getX() < 0 or
             character.getX() > _width * 32.f or
@@ -44,7 +43,7 @@ int World::collide(const Character& character) const
             _tiles->at((int) (character.getX()/32)).at((int) (character.getY()/32)).isVoid()
        )
     {
-        collide_code=0b1;
+        return true;
     }
-    return collide_code;
+    return false;
 }
