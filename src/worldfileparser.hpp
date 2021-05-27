@@ -16,7 +16,6 @@ namespace wfp
      */
     std::unique_ptr<World> parse(
             const std::string filename,
-//            std::unordered_map<std::string, sf::Texture>& texturesMap
             std::unordered_map<std::string, sf::Texture>& textures
             );
 

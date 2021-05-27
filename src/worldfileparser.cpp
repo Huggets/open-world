@@ -24,7 +24,7 @@ std::unique_ptr<World> wfp::parse(
     std::string word;
 
     // Array of tiles defined in the world file
-    std::unique_ptr<Tile[]> tiles;
+    std::unique_ptr<std::vector<std::vector<Tile>>> tiles;
 
     // height of the world defined in the world file
     unsigned int worldHeight(0);
@@ -49,7 +49,6 @@ std::unique_ptr<World> wfp::parse(
     // VARIABLE OF defworld LABEL
     bool worldHeightIsSet(false);
     bool worldWidthIsSet(false);
-    unsigned int worldSize(0);
     unsigned int rowSize(0);
     unsigned int tilesCount(0);
     unsigned int tileX(0);
@@ -186,8 +185,15 @@ defworld:
                 {
                     worldHeight = std::stoul(word);
                     worldHeightIsSet = true;
-                    worldSize = worldWidth * worldHeight;
-                    tiles = std::make_unique<Tile[]>(worldSize);
+                    tiles = std::make_unique<std::vector<std::vector<Tile>>>();
+                    for (unsigned int y = 0 ; y < worldHeight ; y++)
+                    {
+                        tiles->push_back(std::vector<Tile>());
+                        for (unsigned int x = 0 ; x < worldWidth ; x++)
+                        {
+                            tiles->at(y).push_back(Tile());
+                        }
+                    }
                     word.clear();
                 }
                 else
@@ -223,18 +229,20 @@ defworld:
                             rowSize = 0;
                         }
 
-                        Tile* currentTile = &(tiles[tilesCount]);
+                        Tile* currentTile = &(tiles->at(tileX).at(tileY));
 
                         currentTile->setTexture(&textures[
                                 tilesProperties[std::stoul(word)].textureName]);
                         currentTile->setIsVoid(
                                 tilesProperties[std::stoul(word)].isVoid);
-                        currentTile->setPosition(tileX, tileY);
-                        tileX += currentTile->getWidth();
-                        if (tileX/currentTile->getWidth() >= worldWidth)
+                        currentTile->setPosition(
+                                tileX*currentTile->getWidth(),
+                                tileY*currentTile->getHeight());
+                        tileX++;
+                        if (tileX >= worldWidth)
                         {
                             tileX = 0;
-                            tileY += currentTile->getHeight();
+                            tileY++;
                         }
                         tilesCount++;
                         word.clear();
