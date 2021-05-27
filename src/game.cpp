@@ -191,15 +191,6 @@ inline void Game::_frame()
                 (int) ( 1 / (float) ((float)(_diffTime + _sleepTime) / (float)CLOCKS_PER_SEC) )
                 ));
 
-    // Player's moves
-    //if (_tmpPlayerX < 0 or _tmpPlayerX > _world->getWidth()*32)
-    //{
-    //    _tmpPlayerX = _playerCharacter->getX();
-    //}
-    //if (_tmpPlayerY < 0 or _tmpPlayerY > _world->getHeight()*32)
-    //{
-    //    _tmpPlayerY = _playerCharacter->getY();
-    //}
     Character testCharacter(*_playerCharacter);
     testCharacter.setPosition(_tmpPlayerX, _tmpPlayerY);
     if (not _world->collide(testCharacter))
