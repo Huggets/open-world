@@ -4,6 +4,7 @@
 Character::Character() :
     _sprite()
 {
+    _sprite.setPosition(0,0);
 }
 
 void Character::draw(sf::RenderWindow& window) const
@@ -135,4 +136,14 @@ float Character::getX() const
 float Character::getY() const
 {
     return _sprite.getPosition().y;
+}
+
+float Character::getHeight() const
+{
+    return _sprite.getTextureRect().height;
+}
+
+float Character::getWidth() const
+{
+    return _sprite.getTextureRect().width;
 }

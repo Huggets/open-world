@@ -44,6 +44,16 @@ class Character
          */
         float getY() const;
 
+        /*
+           Returns the height of the sprite
+         */
+        float getHeight() const;
+
+        /*
+           Returns the width of the sprite
+         */
+        float getWidth() const;
+
     protected:
         /*
            The sprite of the character.
