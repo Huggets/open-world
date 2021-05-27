@@ -7,6 +7,9 @@
 #include <string>
 #include <SFML/Graphics.hpp>
 #include "tile.hpp"
+#include "character.hpp"
+
+class Character;
 
 /*
    Represents the world where the characters lives.
@@ -17,7 +20,7 @@ class World
         World(
                 unsigned int width,
                 unsigned int height,
-                std::unique_ptr<Tile[]>& tiles
+                std::unique_ptr<std::vector<std::vector<Tile>>>& tiles
              );
 
         /*
@@ -35,6 +38,8 @@ class World
          */
         void draw(sf::RenderWindow& window);
 
+        int collide(const Character& character) const;
+
     protected:
         /*
            Width of the world.
@@ -50,7 +55,7 @@ class World
            Points to the one dimensional array which contains all the tiles
            of the world.
          */
-        std::unique_ptr<Tile[]> _tiles;
+        std::unique_ptr<std::vector<std::vector<Tile>>> _tiles;
 };
 
 enum Direction
