@@ -149,6 +149,19 @@ inline void Game::_frame()
      */
     moveSpeed = 150*(float) ((float)(_diffTime + _sleepTime) / (float)CLOCKS_PER_SEC);
 
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
+    {
+        // The user now controls _person1
+        _playerCharacter = &_person1;
+    }
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
+    {
+        // The user now controls _person2
+        _playerCharacter = &_person2;
+    }
+
+    _tmpPlayerX = _playerCharacter->getX();
+    _tmpPlayerY = _playerCharacter->getY();
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
     {
         _tmpPlayerX = _playerCharacter->getX() - moveSpeed;
@@ -165,16 +178,6 @@ inline void Game::_frame()
     {
         _tmpPlayerY = _playerCharacter->getY() - moveSpeed;
     }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
-    {
-        // The user now controls _person1
-        _playerCharacter = &_person1;
-    }
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num2))
-    {
-        // The user now controls _person2
-        _playerCharacter = &_person2;
-    }
 
     /*
        Main part
@@ -189,15 +192,20 @@ inline void Game::_frame()
                 ));
 
     // Player's moves
-    if (_tmpPlayerX < 0 or _tmpPlayerX > _world->getWidth()*32)
+    //if (_tmpPlayerX < 0 or _tmpPlayerX > _world->getWidth()*32)
+    //{
+    //    _tmpPlayerX = _playerCharacter->getX();
+    //}
+    //if (_tmpPlayerY < 0 or _tmpPlayerY > _world->getHeight()*32)
+    //{
+    //    _tmpPlayerY = _playerCharacter->getY();
+    //}
+    Character testCharacter(*_playerCharacter);
+    testCharacter.setPosition(_tmpPlayerX, _tmpPlayerY);
+    if (not _world->collide(testCharacter))
     {
-        _tmpPlayerX = _playerCharacter->getX();
+        _playerCharacter->setPosition(_tmpPlayerX, _tmpPlayerY);
     }
-    if (_tmpPlayerY < 0 or _tmpPlayerY > _world->getHeight()*32)
-    {
-        _tmpPlayerY = _playerCharacter->getY();
-    }
-    _playerCharacter->setPosition(_tmpPlayerX, _tmpPlayerY);
 
     /*
        Drawing part
