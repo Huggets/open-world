@@ -37,12 +37,12 @@ class Tile
         void setTexture(sf::Texture* texture);
 
         /*
-           TODO Doc
+           Return true if the tile is a void tile.
          */
         bool isVoid() const;
 
         /*
-           TODO Doc
+           Define whether it is a void tile or no.
          */
         void setIsVoid(bool isVoid);
 
@@ -68,7 +68,7 @@ class Tile
         float _height;
 
         /*
-           TODO Doc
+           Whether the tile is a void tile or no.
          */
         bool _isVoid;
 
