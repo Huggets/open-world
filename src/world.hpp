@@ -7,6 +7,7 @@
 #include <string>
 #include <SFML/Graphics.hpp>
 #include "tile.hpp"
+#include "worldpiece.hpp"
 #include "character.hpp"
 
 class Character;
@@ -18,9 +19,7 @@ class World
 {
     public:
         World(
-                unsigned int width,
-                unsigned int height,
-                std::unique_ptr<std::vector<std::vector<Tile>>>& tiles
+                std::unique_ptr<std::vector<std::vector<WorldPiece>>>& worldPieces
              );
 
         /*
@@ -56,10 +55,13 @@ class World
         unsigned int _height;
 
         /*
-           Points to the one dimensional array which contains all the tiles
-           of the world.
+           Points to the one dimensional array which contains all the 
+           world pieces of the world.
+
+           The first index is the y coordinate.
+           The second index is the x coordinate.
          */
-        std::unique_ptr<std::vector<std::vector<Tile>>> _tiles;
+        std::unique_ptr<std::vector<std::vector<WorldPiece>>> _worldPieces;
 };
 
 enum Direction
