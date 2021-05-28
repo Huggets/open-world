@@ -4,14 +4,71 @@ StartTiles
 2: dirt
 EndTiles
 
-StartWorld
-8 8
+# Defining world's tiles
+StartWorldPiece
 1 1 1 1 1 1 1 1
 1 1 1 1 1 1 1 1
-1 2 2 2 1 1 1 0
-1 2 0 2 2 1 1 0
+1 2 2 2 1 1 1 1
+1 2 0 2 2 1 1 1
 1 2 2 2 1 1 1 1
 1 1 1 1 1 1 1 1
 1 1 1 1 1 1 1 1
 0 1 1 1 1 1 0 0
-EndWorld
+EndWorldPiece
+
+StartWorldPiece
+0 0 1 1 1 1 1 0
+1 1 1 2 2 2 1 1
+1 2 2 2 2 2 1 1
+1 2 2 2 2 1 1 1
+1 2 2 2 1 1 1 1
+1 1 2 1 1 1 1 1
+1 1 1 1 1 1 1 1
+0 1 1 1 1 1 1 1
+EndWorldPiece
+
+StartWorldPiece
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+EndWorldPiece
+
+NewWorldPieceLine
+
+StartWorldPiece
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+1 2 2 2 1 1 1 1
+1 2 0 2 2 1 1 1
+1 2 2 2 1 1 1 1
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+0 1 1 1 1 1 0 0
+EndWorldPiece
+
+StartWorldPiece
+0 0 1 1 1 1 1 0
+1 1 1 2 2 2 1 1
+1 2 2 2 2 2 1 1
+1 2 2 2 2 1 1 1
+1 2 2 2 1 1 1 1
+1 1 2 1 1 1 1 1
+1 1 1 1 1 1 1 1
+0 1 1 1 1 1 1 1
+EndWorldPiece
+
+StartWorldPiece
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+1 1 1 1 1 1 1 1
+EndWorldPiece
