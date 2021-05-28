@@ -1,5 +1,4 @@
 #include "character.hpp"
-#include <iostream>
 
 Character::Character() :
     _sprite()
