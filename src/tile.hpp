@@ -1,6 +1,8 @@
 #ifndef DEF_TILE
 #define DEF_TILE
 
+#define TILE_SIZE 32.f
+
 #include <SFML/Graphics.hpp>
 
 /*
@@ -47,16 +49,6 @@ class Tile
         void setIsVoid(bool isVoid);
 
     protected:
-        /*
-           The x coordinate of the tile.
-         */
-        float _x;
-
-        /*
-           The y coordinate of the tile.
-         */
-        float _y;
-
         /*
            The width of the tile.
          */

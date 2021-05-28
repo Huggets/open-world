@@ -1,12 +1,10 @@
 #include "tile.hpp"
 
 Tile::Tile() :
-     _x(0.f),
-     _y(0.f),
-     _width(32.f),
-     _height(32.f),
+     _width(TILE_SIZE),
+     _height(TILE_SIZE),
      _isVoid(true),
-    _shape(sf::Vector2f(32.f, 32.f))
+    _shape(sf::Vector2f(TILE_SIZE, TILE_SIZE))
 {
 }
 
@@ -27,8 +25,6 @@ float Tile::getHeight() const
 
 void Tile::setPosition(float x, float y)
 {
-    _x = x;
-    _y = y;
     _shape.setPosition(x, y);
 }
 
