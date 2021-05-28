@@ -3,7 +3,8 @@
     <head>
         <meta charset="utf-8"/>
         <title>World file documentation</title>
-        <link rel="stlyesheet" href="../stylesheets/main.css"/>
+        <link rel="stylesheet" href="../stylesheets/main.css"/>
+        <link rel="stylesheet" href="../stylesheets/syntax.css"/>
     </head>
 
     <body>
@@ -30,7 +31,7 @@
                     <span class="defpart">StartTiles</span><br/>
                     id: ressource [isvoid]<br/>
                     [...]<br/>
-                    EndTiles<br/>
+                    <span class="defpart">EndTiles</span><br/>
                 </code>
                 <ul>
                     <li><em>id</em> is an integer which is used in the WorldPiece definition.</li>
@@ -42,11 +43,11 @@
             <h2>WorldPiece definition</h2>
             <div class="part">
                 <code>
-                    StartWorldPiece<br/>
+                    <span class="defpart">StartWorldPiece</span><br/>
                     idmatrix<br/>
-                    EndWorldPiece<br/>
+                    <span class="defpart">EndWorldPiece</span><br/>
                     <br/>
-                    [NewWorldPieceLine]<br/>
+                    [<span class="defpart">NewWorldPieceLine</span>]<br/>
                     <br/>
                     [...]<br/>
                 </code>
