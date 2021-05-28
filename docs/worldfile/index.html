@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
     <head>
         <meta charset="utf-8"/>
         <title>World file documentation</title>
-        <link rel="stlyesheet" href="../stylesheets/syntax.css"/>
+        <link rel="stlyesheet" href="../stylesheets/main.css"/>
     </head>
 
     <body>
@@ -18,9 +18,9 @@
             <h2>Types</h2>
             <div class="part">
                 <p>
-                Integer: an integer number.<br/>
-                String: a string without double or single quotes.<br/>
-                Boolean: true or false.
+                <em>Integer</em>: an integer number.<br/>
+                <em>String</em>: a string without double or single quotes.<br/>
+                <em>Boolean</em>: true or false.
                 </p>
             </div>
 
@@ -32,13 +32,11 @@
                     [...]<br/>
                     EndTiles<br/>
                 </code>
-                <p>
                 <ul>
-                    <li>id is an integer which is used in the WorldPiece definition</li>
-                    <li>resource is the name of the png located in data/images/. It is the image the tile uses.</li>
-                    <li>isvoid is an optional boolean which indicates whether the tile must be considered as a void tile or not. Set to false if not indicate.</li>
+                    <li><em>id</em> is an integer which is used in the WorldPiece definition.</li>
+                    <li><em>resource</em> is the name of the png located in data/images/. It is the image the tile uses.</li>
+                    <li><em>isvoid</em> is an optional boolean which indicates whether the tile must be considered as a void tile or not. Set to false if not indicated.</li>
                 </ul>
-                </p>
             </div>
 
             <h2>WorldPiece definition</h2>
@@ -57,7 +55,10 @@
                 The couple StartWorldPiece and EndWorldPiece defines a single piece of world.<br/>
                 Each times a couple is defined, it adds it to the right of the previous defined.<br/>
                 <br/>
-                WorldPieceLine make a new empty line of pieces of world.
+                WorldPieceLine make a new empty line of pieces of world.<br/>
+                <br/>
+                idmatrix is a 2 dimensional array of integers. These integers correspond to the id of the tile you want to place.<br/>
+                Its size is 8 by 8.
                 </p>
             </div>
         </main>
