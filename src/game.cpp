@@ -1,12 +1,9 @@
 #include "game.hpp"
-#include <cstring>
 #include <ctime>
 #include <chrono>
-#include <fstream>
-#include <iostream>
 #include <queue>
+#include <fstream>
 #include <thread>
-#include <vector>
 #include "console.hpp"
 #include "worldfileparser.hpp"
 
@@ -164,19 +161,19 @@ inline void Game::_frame()
     _tmpPlayerY = _playerCharacter->getY();
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
     {
-        _tmpPlayerX = _playerCharacter->getX() - moveSpeed;
+        _tmpPlayerX -= moveSpeed;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
     {
-        _tmpPlayerX = _playerCharacter->getX() + moveSpeed;
+        _tmpPlayerX += moveSpeed;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
     {
-        _tmpPlayerY = _playerCharacter->getY() + moveSpeed;
+        _tmpPlayerY += moveSpeed;
     }
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
     {
-        _tmpPlayerY = _playerCharacter->getY() - moveSpeed;
+        _tmpPlayerY -= moveSpeed;
     }
 
     /*
