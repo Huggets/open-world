@@ -1,6 +1,5 @@
 #include "worldfileparser.hpp"
 #include <fstream>
-#include <iostream>
 #include <unordered_map>
 #include <string>
 #include <memory>
@@ -23,17 +22,12 @@ std::unique_ptr<World> wfp::parse(
     // The word that is read
     std::string word;
 
-    // Array of tiles defined in the world file
-    std::unique_ptr<std::vector<std::vector<Tile>>> tiles;
-
-    // height of the world defined in the world file
-    unsigned int worldHeight(0);
-
-    // width of the world defined in the world file
-    unsigned int worldWidth(0);
-
     // Store the properties of a tile. The key is the id of the tile
     std::unordered_map<int, wfp::TileProperties> tilesProperties;
+
+    // Vector of all WorldPieces which are in the world
+    auto worldPieces(std::make_unique<std::vector<std::vector<WorldPiece>>>());
+    worldPieces->push_back(std::vector<WorldPiece>());
     
     // TILE PROPERTY NAME
     const std::string PROP_TEXTURE_NAME("textureName");
@@ -46,14 +40,13 @@ std::unique_ptr<World> wfp::parse(
     std::string tileTextureName;
     bool tileIsVoid(false);
 
-    // VARIABLE OF defworld LABEL
-    bool worldHeightIsSet(false);
-    bool worldWidthIsSet(false);
+    // VARIABLE OF defworldpiece LABEL
     unsigned int rowSize(0);
-    unsigned int tilesCount(0);
     unsigned int tileX(0);
     unsigned int tileY(0);
-
+    unsigned int worldPieceX(0);
+    unsigned int worldPieceY(0);
+    std::unique_ptr<Tile[][WORLDPIECE_SIZE]> tiles;
 
     // Analyzes the content of the file and sets the variables according to it
     if (worldFile.is_open())
@@ -70,10 +63,17 @@ start:
                     word.clear();
                     goto deftile;
                 }
-                else if (word == "StartWorld")
+                else if (word == "StartWorldPiece")
                 {
                     word.clear();
-                    goto defworld;
+                    goto defworldpiece;
+                }
+                else if (word == "NewWorldPieceLine")
+                {
+                    worldPieceY++;
+                    worldPieceX = 0;
+                    worldPieces->push_back(std::vector<WorldPiece>());
+                    word.clear();
                 }
                 else
                 {
@@ -162,91 +162,63 @@ deftile:
 
         goto end;
 
-defworld:
+defworldpiece:
+        tiles = std::make_unique<Tile[][WORLDPIECE_SIZE]>(WORLDPIECE_SIZE);
+        rowSize = 0;
+        tileX = 0;
+        tileY = 0;
+
         while (not worldFile.eof())
         {
             c = worldFile.get();
 
             if (c == ' ' or c == '\t' or c == '\n')
             {
-                if (word == "EndWorld")
+                if (word == "EndWorldPiece")
                 {
+                    worldPieces->at(worldPieceY).push_back(WorldPiece(tiles));
+                    worldPieceX++;
                     word.clear();
                     goto start;
                 }
-
-                if (not worldWidthIsSet)
-                {
-                    worldWidth = std::stoul(word);
-                    worldWidthIsSet = true;
-                    word.clear();
-                }
-                else if (not worldHeightIsSet)
-                {
-                    worldHeight = std::stoul(word);
-                    worldHeightIsSet = true;
-                    tiles = std::make_unique<std::vector<std::vector<Tile>>>();
-                    for (unsigned int y = 0 ; y < worldHeight ; y++)
-                    {
-                        tiles->push_back(std::vector<Tile>());
-                        for (unsigned int x = 0 ; x < worldWidth ; x++)
-                        {
-                            tiles->at(y).push_back(Tile());
-                        }
-                    }
-                    word.clear();
-                }
                 else
                 {
-                    if (word.empty())
+                    rowSize++;
+
+                    if (c == '\n')
                     {
-                        // TODO Optimize this to avoid repetition below
-                        if (c == '\n' and rowSize < worldWidth)
+                        if (rowSize > WORLDPIECE_SIZE)
                         {
-                                // TODO Make exception for this
-                                console::error("World file: row not fully defined");
-                                throw std::exception();
+                            // TODO Make exception for this
+                            console::error("World file: exceeding world width");
+                            throw std::exception();
                         }
+                        else if (rowSize < WORLDPIECE_SIZE)
+                        {
+                            // TODO Make exception for this
+                            console::error("World file: row not fully defined");
+                            throw std::exception();
+                        }
+                        rowSize = 0;
                     }
-                    else
+
+                    // Creating the tile and setting its properties
+                    Tile* currentTile = &(tiles[tileX][tileY]);
+                    currentTile->setTexture(&textures[
+                            tilesProperties[std::stoul(word)].textureName]);
+                    currentTile->setIsVoid(
+                            tilesProperties[std::stoul(word)].isVoid);
+                    currentTile->setPosition(
+                            tileX*TILE_SIZE + worldPieceX * WORLDPIECE_SIZE*TILE_SIZE,
+                            tileY*TILE_SIZE + worldPieceY * WORLDPIECE_SIZE*TILE_SIZE);
+
+                    tileX++;
+                    if (tileX >= WORLDPIECE_SIZE)
                     {
-                        rowSize++;
-
-                        if (c == '\n')
-                        {
-                            if (rowSize > worldWidth)
-                            {
-                                // TODO Make exception for this
-                                console::error("World file: exceeding world width");
-                                throw std::exception();
-                            }
-                            else if (rowSize < worldHeight)
-                            {
-                                // TODO Make exception for this
-                                console::error("World file: row not fully defined");
-                                throw std::exception();
-                            }
-                            rowSize = 0;
-                        }
-
-                        Tile* currentTile = &(tiles->at(tileX).at(tileY));
-
-                        currentTile->setTexture(&textures[
-                                tilesProperties[std::stoul(word)].textureName]);
-                        currentTile->setIsVoid(
-                                tilesProperties[std::stoul(word)].isVoid);
-                        currentTile->setPosition(
-                                tileX*currentTile->getWidth(),
-                                tileY*currentTile->getHeight());
-                        tileX++;
-                        if (tileX >= worldWidth)
-                        {
-                            tileX = 0;
-                            tileY++;
-                        }
-                        tilesCount++;
-                        word.clear();
+                        tileX = 0;
+                        tileY++;
                     }
+                    word.clear();
                 }
             }
             else
@@ -269,5 +241,5 @@ end:
         console::error(message);
     }
 
-    return std::make_unique<World>(worldWidth, worldHeight, tiles);
+    return std::make_unique<World>(worldPieces);
 }
