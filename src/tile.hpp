@@ -4,14 +4,30 @@
 #define TILE_SIZE 32.f
 
 #include <SFML/Graphics.hpp>
+#include "transformable.hpp"
 
 /*
    Represents a single tile of a World.
  */
-class Tile
+class Tile : public Transformable
 {
     public:
         Tile();
+
+        /*
+           Moves the tile according to the offsets.
+         */
+        virtual void move(float offsetX, float offsetY) override;
+
+        /*
+           Sets the x and y coordinate of the tile;
+         */
+        virtual void setPosition(float x, float y) override;
+
+        /*
+           Update the position of the shape's tile.
+         */
+        virtual void updatePosition() override;
 
         /*
            Draws the tile on the window.
@@ -27,11 +43,6 @@ class Tile
            Returns the height of the tile.
          */
         float getHeight() const;
-
-        /*
-           Sets the position of the tile.
-         */
-        void setPosition(float x, float y);
 
         /*
            Sets the texture of the tile.
@@ -50,6 +61,11 @@ class Tile
 
     protected:
         /*
+           The shape that represent the tile.
+         */
+        sf::RectangleShape _shape;
+
+        /*
            The width of the tile.
          */
         float _width;
@@ -63,11 +79,6 @@ class Tile
            Whether the tile is a void tile or no.
          */
         bool _isVoid;
-
-        /*
-           The shape that represent the tile.
-         */
-        sf::RectangleShape _shape;
 };
 
 #endif
