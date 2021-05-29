@@ -12,7 +12,7 @@ Game::Game(
         float playerX,
         float playerY
         ) :
-    _window(sf::VideoMode(800, 600), "Open World", sf::Style::Close),
+    _window(sf::VideoMode(WINDOW_WIDTH, WINDOW_HEIGHT), "Open World", sf::Style::Close),
     _font(),
     _playerCoordinatesText(),
     _fpsText(),
@@ -26,7 +26,9 @@ Game::Game(
     _sleepTime(0),
     _person1(),
     _person2(),
-    _playerCharacter(&_person1)
+    _playerCharacter(&_person1),
+    _scrollX(0),
+    _scrollY(0)
 {
     /*
        Loading files
@@ -61,6 +63,12 @@ Game::Game(
     _fpsText.setPosition(0, 0);
     _fpsText.setFillColor(sf::Color::Black);
     _fpsText.setString("No fps");
+    _rectangleLimitScroll.x = 200;
+    _rectangleLimitScroll.y = 150;
+    _rectangleLimitScroll.width = 400;
+    _rectangleLimitScroll.height = 300;
+    _maxScrollX = _world->getWidth() * WORLDPIECE_SIZE * TILE_SIZE - WINDOW_WIDTH;
+    _maxScrollY = _world->getHeight() * WORLDPIECE_SIZE * TILE_SIZE - WINDOW_HEIGHT;
 }
 
 void Game::run(bool profile, const std::string& performanceFile)
@@ -148,9 +156,9 @@ inline void Game::_frame()
     }
 
     /*
-       Input part
+       INPUT PART
      */
-    moveSpeed = 150*(float) ((float)(_diffTime + _sleepTime) / (float)CLOCKS_PER_SEC);
+    moveSpeed = 150*(float) ((float)(_diffTime + _sleepTime) / (float)CLOCKS_PER_SEC) * 4;
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
     {
@@ -183,30 +191,81 @@ inline void Game::_frame()
     }
 
     /*
-       Main part
+       MAIN PART
      */
     // Displaying texts
     _playerCoordinatesText.setString(
             "X: " + std::to_string(_playerCharacter->getX()) +
-            ", Y: " + std::to_string(_playerCharacter->getY()
-                ));
+            ", Y: " + std::to_string(_playerCharacter->getY()) +
+            ", scrollX: " + std::to_string(_scrollX) +
+            ", scrollY: " + std::to_string(_scrollY)
+            );
     _fpsText.setString(std::to_string(
                 (int) ( 1 / (float) ((float)(_diffTime + _sleepTime) / (float)CLOCKS_PER_SEC) )
                 ));
-
+    // Moving the player
     Character testCharacter(*_playerCharacter);
     testCharacter.setPosition(_tmpPlayerX, _tmpPlayerY);
-    if (not _world->collide(testCharacter))
+    if (_world->collide(testCharacter))
     {
-        _playerCharacter->setPosition(_tmpPlayerX, _tmpPlayerY);
+        _tmpPlayerX = _playerCharacter->getX();
+        _tmpPlayerY = _playerCharacter->getY();
+    }
+    _playerCharacter->setPosition(_tmpPlayerX, _tmpPlayerY);
+
+    // Updating the scrolling
+    int xLimMin = _scrollX + _rectangleLimitScroll.x;
+    int yLimMin = _scrollY + _rectangleLimitScroll.y;
+    int xLimMax = xLimMin + _rectangleLimitScroll.width;
+    int yLimMax = yLimMin + _rectangleLimitScroll.height;
+    if (_playerCharacter->getX() < xLimMin)
+    {
+        _scrollX -= xLimMin - _playerCharacter->getX();
+    }
+    else if (_playerCharacter->getX() > xLimMax)
+    {
+        _scrollX += _playerCharacter->getX() - xLimMax;
+    }
+    if (_playerCharacter->getY() < yLimMin)
+    {
+        _scrollY -= yLimMin - _playerCharacter->getY();
+    }
+    else if (_playerCharacter->getY() > yLimMax)
+    {
+        _scrollY += _playerCharacter->getY() - yLimMax;
+    }
+    if (_scrollX < 0)
+    {
+        _scrollX = 0;
+    }
+    else if (_scrollX > _maxScrollX)
+    {
+        _scrollX = _maxScrollX;
+    }
+    if (_scrollY < 0)
+    {
+        _scrollY = 0;
+    }
+    else if (_scrollY > _maxScrollY)
+    {
+        _scrollY = _maxScrollY;
     }
 
+
+    // Updating the coordinates' characters
+    _person1.scroll(_scrollX, _scrollY);
+    _person2.scroll(_scrollX, _scrollY);
+    _person1.updatePosition();
+    _person2.updatePosition();
+
+    //_world->scroll(_scrollX, _scrollY);
+
     /*
-       Drawing part
+       DRAWING PART
      */
     _window.clear(sf::Color::White);
 
-    _world->draw(_window);
+    _world->draw(_window, _scrollX, _scrollY);
     _person1.draw(_window);
     _person2.draw(_window);
     _window.draw(_playerCoordinatesText);
@@ -215,7 +274,7 @@ inline void Game::_frame()
     _window.display();
 
     /*
-       Sleep a certain amount of time in order to have a fps limit
+       SLEEP A CERTAIN AMOUNT OF TIME IN ORDER TO HAVE A FPS LIMIT
      */
     _sleepTime = int (1.f / 144 * CLOCKS_PER_SEC - _diffTime);
     std::this_thread::sleep_for(

@@ -8,6 +8,9 @@
 #include "world.hpp"
 #include "character.hpp"
 
+#define WINDOW_WIDTH 800
+#define WINDOW_HEIGHT 600
+
 /*
    Represents the entire game.
  */
@@ -115,6 +118,24 @@ class Game
            Speed at which the player moves.
          */
         float moveSpeed;
+
+        /*
+           Offset used to only display a part of the world
+         */
+        int _scrollX;
+        int _scrollY;
+
+        struct
+        {
+            float x;
+            float y;
+            int width;
+            int height;
+        } _rectangleLimitScroll;
+
+    private:
+        int _maxScrollX;
+        int _maxScrollY;
 };
 
 #endif
