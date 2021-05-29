@@ -1,4 +1,6 @@
 - Search for sorting source files in a better way than in a single directory
 
-- Code the help menu that is displayed when adding --help or -h to the command
-line (main.cpp)
+- Find the bug that cause the character to move when it is in the middle of the
+  scrolling rectangle because it shouldn't
+
+- Code a level editor
