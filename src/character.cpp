@@ -1,9 +1,10 @@
 #include "character.hpp"
 
 Character::Character() :
+    Transformable(),
     _sprite()
 {
-    _sprite.setPosition(0,0);
+    _sprite.setPosition(_x, _y);
 }
 
 void Character::draw(sf::RenderWindow& window) const
@@ -70,26 +71,26 @@ void Character::move(float offsetX, float offsetY)
             break;
     }
 
-    _sprite.move(offsetX, offsetY);
+    _x += offsetX;
+    _y += offsetY;
 }
 
 void Character::setPosition(float x, float y)
 {
     int direction = Direction::NONE;
-    sf::Vector2f spritePos = _sprite.getPosition();
-    if (x < spritePos.x)
+    if (x < _x)
     {
         direction = Direction::WEST;
     }
-    else if (x > spritePos.x)
+    else if (x > _x)
     {
         direction = Direction::EAST;
     }
-    if (y < spritePos.y)
+    if (y < _y)
     {
         direction =  static_cast<int>(Direction::NORTH) + direction;
     }
-    else if (y > spritePos.y)
+    else if (y > _y)
     {
         direction = static_cast<int>(Direction::SOUTH) + direction;
     }
@@ -124,17 +125,13 @@ void Character::setPosition(float x, float y)
             break;
     }
 
-    _sprite.setPosition(x, y);
+    _x = x;
+    _y = y;
 }
 
-float Character::getX() const
+void Character::updatePosition()
 {
-    return _sprite.getPosition().x;
-}
-
-float Character::getY() const
-{
-    return _sprite.getPosition().y;
+    _sprite.setPosition(_x - _scrollX, _y - _scrollY);
 }
 
 float Character::getHeight() const

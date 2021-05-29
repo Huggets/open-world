@@ -3,11 +3,12 @@
 
 #include <SFML/Graphics.hpp>
 #include "world.hpp"
+#include "transformable.hpp"
 
 /*
    Represent a game character.
  */
-class Character
+class Character : public Transformable
 {
     public:
         Character();
@@ -23,26 +24,29 @@ class Character
         void setTexture(sf::Texture& texture);
 
         /*
-           Moves the character and change its direction according
+           Moves the acharacter and change its direction according
            to the offsets.
+
+           updatePosition() must be called after this to also update the
+           position of the sprite. Otherwise the character will not change
+           its position on the screen.
          */
-        void move(float offsetX, float offsetY);
+        virtual void move(float offsetX, float offsetY) override;
 
         /*
            Sets the x and y coordinate of the character and change
            its direction according to them.
+
+           updatePosition() must be called after this to also update the
+           position of the sprite. Otherwise the character will not change
+           its position on the screen.
          */
-        void setPosition(float x, float y);
+        virtual void setPosition(float x, float y) override;
 
         /*
-           Returns the x absolute coordinate of the character.
+           Update the position of the sprite's character.
          */
-        float getX() const;
-
-        /*
-           Returns the y absolute coordinate of the character.
-         */
-        float getY() const;
+        virtual void updatePosition() override;
 
         /*
            Returns the height of the sprite
