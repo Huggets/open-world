@@ -9,6 +9,8 @@ int main(int argc, char** argv)
     bool savePerformance(false);
     std::string performanceFilename("data/profiles/profile.latest");
     std::string worldFilename("data/worlds/world1.world");
+    float playerX(0);
+    float playerY(0);
 
     for (int i = 1 ; i < argc ; i++)
     {
@@ -59,9 +61,26 @@ int main(int argc, char** argv)
                 worldFilename = argv[i+1];
             }
         }
+        else if (
+                strcmp(argv[i], "--coordinate") == 0
+                or strcmp(argv[i], "-c") == 0
+                )
+        {
+            if (i+2 < argc and strlen(argv[i+2]) != 0 and strlen(argv[i+1]) != 0)
+            {
+                try {
+                    playerX = std::stof(argv[i+1]);
+                    playerY = std::stof(argv[i+2]);
+                }
+                catch (std::invalid_argument const&)
+                {
+                    console::warning("The coordinates given must be numbers!");
+                }
+            }
+        }
     }
 
-    Game game(worldFilename);
+    Game game(worldFilename, playerX, playerY);
     game.run(savePerformance, performanceFilename);
 
     return 0;
