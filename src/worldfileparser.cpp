@@ -211,6 +211,7 @@ defworldpiece:
                     currentTile->setPosition(
                             tileX*TILE_SIZE + worldPieceX * WORLDPIECE_SIZE*TILE_SIZE,
                             tileY*TILE_SIZE + worldPieceY * WORLDPIECE_SIZE*TILE_SIZE);
+                    currentTile->updatePosition();
 
                     tileX++;
                     if (tileX >= WORLDPIECE_SIZE)
