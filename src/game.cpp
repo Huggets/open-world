@@ -7,7 +7,11 @@
 #include "console.hpp"
 #include "worldfileparser.hpp"
 
-Game::Game(const std::string& worldFilename) :
+Game::Game(
+        const std::string& worldFilename,
+        float playerX,
+        float playerY
+        ) :
     _window(sf::VideoMode(800, 600), "Open World", sf::Style::Close),
     _font(),
     _playerCoordinatesText(),
@@ -48,6 +52,8 @@ Game::Game(const std::string& worldFilename) :
      */
     _person1.setTexture(_textures["person"]);
     _person2.setTexture(_textures["person"]);
+    _person1.setPosition(playerX, playerY);
+    _person2.setPosition(playerX, playerY);
     _playerCoordinatesText.setFont(_font);
     _playerCoordinatesText.setPosition(0, 570);
     _playerCoordinatesText.setFillColor(sf::Color::Black);

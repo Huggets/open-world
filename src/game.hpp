@@ -14,7 +14,10 @@
 class Game
 {
     public:
-        Game(const std::string& worldFilename);
+        Game(
+                const std::string& worldFilename,
+                float playerX,
+                float playerY);
 
         /*
            Starts the game.
