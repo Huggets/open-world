@@ -35,7 +35,7 @@ class World
         /*
            Draw the tiles on the window.
          */
-        void draw(sf::RenderWindow& window);
+        void draw(sf::RenderWindow& window, int scrollX, int scrollY);
 
         /*
            Return true if character is colliding, for example if the
@@ -45,23 +45,47 @@ class World
 
     protected:
         /*
-           Width of the world.
+           Width of the world (In number of WorldPieces).
          */
         unsigned int _width;
 
         /*
-           Height of the world.
+           Height of the world (In number of WorldPieces).
          */
         unsigned int _height;
 
         /*
-           Points to the one dimensional array which contains all the 
-           world pieces of the world.
+           Total number of tiles on the width on the world.
+
+           TODO This sentence may be incorrect. Change it to be more
+           explanatory.
+         */
+        unsigned int _tileWidthCount;
+
+        /*
+           Total number of tiles on the height on the world.
+
+           TODO This sentence may be incorrect. Change it to be more
+           explanatory.
+         */
+        unsigned int _tileHeightCount;
+
+        /*
+           Pointer to an array of WorldPieces which contains all the tiles
+           of the world.
 
            The first index is the y coordinate.
            The second index is the x coordinate.
          */
         std::unique_ptr<std::vector<std::vector<WorldPiece>>> _worldPieces;
+
+        /*
+           Offsets the tiles are moving.
+
+           Used to not display every tile.
+         */
+        int _scrollX;
+        int _scrollY;
 };
 
 enum Direction
