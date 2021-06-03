@@ -120,11 +120,14 @@ class Game
         float moveSpeed;
 
         /*
-           Offset used to only display a part of the world
+           Offset used to only display a part of the world.
          */
         int _scrollX;
         int _scrollY;
 
+        /*
+           The scrolling rectangle.
+         */
         struct
         {
             float x;
@@ -133,9 +136,13 @@ class Game
             int height;
         } _rectangleLimitScroll;
 
-    private:
+        // TODO Document this
         int _maxScrollX;
         int _maxScrollY;
+        int _xLimMin;
+        int _yLimMin;
+        int _xLimMax;
+        int _yLimMax;
 };
 
 #endif

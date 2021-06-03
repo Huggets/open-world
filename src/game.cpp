@@ -63,10 +63,10 @@ Game::Game(
     _fpsText.setPosition(0, 0);
     _fpsText.setFillColor(sf::Color::Black);
     _fpsText.setString("No fps");
-    _rectangleLimitScroll.x = 200;
-    _rectangleLimitScroll.y = 150;
-    _rectangleLimitScroll.width = 400;
-    _rectangleLimitScroll.height = 300;
+    _rectangleLimitScroll.x = WINDOW_WIDTH / 2;
+    _rectangleLimitScroll.y = WINDOW_HEIGHT / 2;
+    _rectangleLimitScroll.width = 1;
+    _rectangleLimitScroll.height = 1;
     _maxScrollX = _world->getWidth() * WORLDPIECE_SIZE * TILE_SIZE - WINDOW_WIDTH;
     _maxScrollY = _world->getHeight() * WORLDPIECE_SIZE * TILE_SIZE - WINDOW_HEIGHT;
 }
@@ -158,7 +158,7 @@ inline void Game::_frame()
     /*
        INPUT PART
      */
-    moveSpeed = 150*(float) ((float)(_diffTime + _sleepTime) / (float)CLOCKS_PER_SEC) * 4;
+    moveSpeed = 150*(float) ((float)(_diffTime + _sleepTime) / (float)CLOCKS_PER_SEC);
 
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Num1))
     {
@@ -214,25 +214,25 @@ inline void Game::_frame()
     _playerCharacter->setPosition(_tmpPlayerX, _tmpPlayerY);
 
     // Updating the scrolling
-    int xLimMin = _scrollX + _rectangleLimitScroll.x;
-    int yLimMin = _scrollY + _rectangleLimitScroll.y;
-    int xLimMax = xLimMin + _rectangleLimitScroll.width;
-    int yLimMax = yLimMin + _rectangleLimitScroll.height;
-    if (_playerCharacter->getX() < xLimMin)
+    _xLimMin = _scrollX + _rectangleLimitScroll.x;
+    _yLimMin = _scrollY + _rectangleLimitScroll.y;
+    _xLimMax = _xLimMin + _rectangleLimitScroll.width;
+    _yLimMax = _yLimMin + _rectangleLimitScroll.height;
+    if (_playerCharacter->getX() < _xLimMin)
     {
-        _scrollX -= xLimMin - _playerCharacter->getX();
+        _scrollX -= _xLimMin - _playerCharacter->getX();
     }
-    else if (_playerCharacter->getX() > xLimMax)
+    else if (_playerCharacter->getX() > _xLimMax)
     {
-        _scrollX += _playerCharacter->getX() - xLimMax;
+        _scrollX += _playerCharacter->getX() - _xLimMax;
     }
-    if (_playerCharacter->getY() < yLimMin)
+    if (_playerCharacter->getY() < _yLimMin)
     {
-        _scrollY -= yLimMin - _playerCharacter->getY();
+        _scrollY -= _yLimMin - _playerCharacter->getY();
     }
-    else if (_playerCharacter->getY() > yLimMax)
+    else if (_playerCharacter->getY() > _yLimMax)
     {
-        _scrollY += _playerCharacter->getY() - yLimMax;
+        _scrollY += _playerCharacter->getY() - _yLimMax;
     }
     if (_scrollX < 0)
     {
@@ -257,8 +257,6 @@ inline void Game::_frame()
     _person2.scroll(_scrollX, _scrollY);
     _person1.updatePosition();
     _person2.updatePosition();
-
-    //_world->scroll(_scrollX, _scrollY);
 
     /*
        DRAWING PART
