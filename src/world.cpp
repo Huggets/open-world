@@ -107,21 +107,19 @@ void World::draw(sf::RenderWindow& window, int scrollX, int scrollY)
 
 bool World::collide(const Character& character) const
 {
-    float characterX(character.getX());
-    float characterY(character.getY());
     unsigned int worldPieceX(
-            (unsigned int) (characterX / (WORLDPIECE_SIZE * TILE_SIZE)));
+            (unsigned int) (character.getX() / (WORLDPIECE_SIZE * TILE_SIZE)));
     unsigned int worldPieceY(
-            (unsigned int) (characterY / (WORLDPIECE_SIZE * TILE_SIZE)));
+            (unsigned int) (character.getY() / (WORLDPIECE_SIZE * TILE_SIZE)));
     unsigned int tileX(
-            (unsigned int) (characterX / TILE_SIZE) - WORLDPIECE_SIZE * worldPieceX);
+            (unsigned int) (character.getX() / TILE_SIZE) - WORLDPIECE_SIZE * worldPieceX);
     unsigned int tileY(
-            (unsigned int) (characterY / TILE_SIZE) - WORLDPIECE_SIZE * worldPieceY);
+            (unsigned int) (character.getY() / TILE_SIZE) - WORLDPIECE_SIZE * worldPieceY);
     if (
-            characterX < 0 or
-            characterX > _width * WORLDPIECE_SIZE * TILE_SIZE or
-            characterY < 0 or
-            characterY > _height * WORLDPIECE_SIZE * TILE_SIZE or
+            character.getX() < 0 or
+            character.getX() > _width * WORLDPIECE_SIZE * TILE_SIZE or
+            character.getY() < 0 or
+            character.getY() > _height * WORLDPIECE_SIZE * TILE_SIZE or
             _worldPieces->at(worldPieceY).at(worldPieceX).tiles[tileX][tileY].isVoid()
        )
     {
